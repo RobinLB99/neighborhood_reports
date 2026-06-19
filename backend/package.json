@@ -1,0 +1,38 @@
+{
+    "name": "reports",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "vercel dev",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "generate-docs": "tsx scripts/generate-openapi.ts --output ../contracts/openapi.json",
+        "db:generate": "drizzle-kit generate",
+        "db:migrate": "drizzle-kit migrate",
+        "db:studio": "drizzle-kit studio"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "^11.7.0",
+            "onFail": "download"
+        }
+    },
+    "type": "module",
+    "dependencies": {
+        "@neondatabase/serverless": "^1.1.0",
+        "drizzle-orm": "^0.45.2",
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "@types/node": "^25.9.3",
+        "@vercel/node": "^5.8.17",
+        "drizzle-kit": "^0.31.10",
+        "tsx": "^4.22.4",
+        "typescript": "^6.0.3",
+        "vercel": "^54.14.2"
+    }
+}

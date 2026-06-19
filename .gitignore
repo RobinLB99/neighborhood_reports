@@ -1,0 +1,101 @@
+# ##############################################################################
+# 🛡️ FASTWORKS - ARCHIVO DE CONFIGURACIÓN DE EXCLUSIONES DE GIT (.gitignore)
+# ##############################################################################
+# Este archivo centraliza todas las exclusiones para el monorepo de FastWorks.
+# Evita tener múltiples archivos .gitignore dispersos por los subproyectos.
+# ##############################################################################
+
+# ==============================================================================
+# 📦 GESTIÓN DE DEPENDENCIAS
+# ==============================================================================
+# Ignora las dependencias instaladas localmente en la raíz y en subproyectos.
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# ==============================================================================
+# 🚀 COMPILACIONES Y SALIDAS DE CONSTRUCCIÓN (BUILD)
+# =================================################################=============
+# Frontend (Astro / Vite / Svelte / Preact)
+dist/
+.astro/
+.vercel/
+
+# Backend u otros empaquetados
+build/
+out/
+bin/
+obj/
+
+# ==============================================================================
+# 🔑 SEGURIDAD Y CONFIGURACIÓN LOCAL (¡CRÍTICO!)
+# ==============================================================================
+# Bloquear variables de entorno para evitar filtraciones de credenciales y secretos.
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production
+.env.production.local
+.env.backup
+*.env
+
+# PERMITIR explícitamente los archivos de plantilla de entorno para documentación.
+!.env.example
+!**/ .env.example
+
+# ==============================================================================
+# 📊 LOGS, DIAGNÓSTICOS Y CACHÉ
+# ==============================================================================
+*.log
+logs
+*.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Caché de compiladores y herramientas
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.turbo/
+.parcel-cache/
+
+# ==============================================================================
+# 🧪 COBERTURA DE PRUEBAS
+# ==============================================================================
+coverage/
+.nyc_output/
+
+# ==============================================================================
+# 💻 CONFIGURACIÓN DE ENTORNOS DE DESARROLLO (IDEs / EDITORES)
+# ==============================================================================
+# JetBrains (IntelliJ, WebStorm, PhpStorm, etc.)
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Visual Studio Code
+# Nota: Excluimos configuraciones compartidas esenciales si el equipo las requiere,
+# pero ignoramos las carpetas locales de estado personal.
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+.history/
+
+# Archivos específicos de Sistemas Operativos
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =================================################################=============
+# 🤖 HERRAMIENTAS CLI Y AGENTES (Antigravity/Gemini)
+# ==============================================================================
+.antigravitycli/
