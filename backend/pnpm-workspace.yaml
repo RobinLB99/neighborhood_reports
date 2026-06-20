@@ -1,4 +1,5 @@
 allowBuilds:
+  bufferutil: false
   esbuild: true
 minimumReleaseAgeExclude:
   - undici@5.28.5
