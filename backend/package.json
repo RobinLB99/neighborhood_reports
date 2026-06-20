@@ -24,6 +24,7 @@
     "type": "module",
     "dependencies": {
         "@neondatabase/serverless": "^1.1.0",
+        "cloudinary": "^2.10.0",
         "drizzle-orm": "^0.45.2",
         "zod": "^4.4.3"
     },
