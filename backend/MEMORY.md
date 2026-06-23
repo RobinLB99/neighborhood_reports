@@ -49,6 +49,16 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Mejora la mantenibilidad, facilita el onboarding de nuevos colaboradores y habilita la autogeneración automática de documentación de APIs y componentes del sistema.
     *   **Negativas:** Incremento marginal en el tamaño de las líneas de código, aunque irrelevante para el empaquetado final tras la transpilación a JavaScript.
 
+### 2. Generación Automatizada del Contrato OpenAPI (`scripts/generate-openapi.ts`)
+*   **Contexto:** Se requiere mantener sincronizado el contrato OpenAPI con los schemas de validación Zod existentes en el backend para que el frontend pueda auto-generar tipos y clientes de forma automatizada y sin acoplamiento directo.
+*   **Decisión:** Implementar un compilador de especificación dinámico utilizando `@asteasolutions/zod-to-openapi` e instanciar un registro central en `shared-kernel`.
+*   **Implementación:**
+    *   Se creó [registry.ts](file:///home/joel/Proyectos%20Full-Stack/reports/backend/src/shared-kernel/openapi/registry.ts) centralizando la extensión de Zod y la matriculación de esquemas y rutas.
+    *   Se desarrolló [generate-openapi.ts](file:///home/joel/Proyectos%20Full-Stack/reports/backend/scripts/generate-openapi.ts) para generar el archivo `openapi.json` resolviendo rutas absolutas de forma segura en base al directorio del comando.
+*   **Consecuencias:**
+    *   **Positivas:** Contrato OpenAPI autogenerado y siempre fiel a las reglas de validación en tiempo de ejecución. El frontend puede tiparse de forma 100% independiente.
+    *   **Negativas:** Añade una dependencia de desarrollo adicional (`@asteasolutions/zod-to-openapi`) y requiere registrar de forma explícita cada ruta y DTO nuevo en el `registry`.
+
 ---
 
 
