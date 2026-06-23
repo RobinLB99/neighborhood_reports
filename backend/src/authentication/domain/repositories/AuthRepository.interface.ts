@@ -1,0 +1,15 @@
+import { User } from "../entities/User.js";
+
+export interface AuthRepository {
+  /**
+   * Busca un usuario por su nombre de usuario (usuario).
+   * Retorna null si no se encuentra.
+   */
+  findByUsername(usuario: string): Promise<User | null>;
+
+  /**
+   * Busca un usuario por su ID único.
+   * Retorna null si no se encuentra.
+   */
+  findById(id: number): Promise<User | null>;
+}
