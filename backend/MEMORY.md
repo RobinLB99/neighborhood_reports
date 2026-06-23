@@ -61,6 +61,20 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ---
 
+## 🐳 Decisiones de Infraestructura y Contenedores
+
+### 1. Servicio de Node.js en Docker Compose y Dockerfile Multi-stage con Origen Explícito
+*   **Contexto:** Se requiere un entorno local reproducible para ejecutar y compilar el backend de TypeScript alineado con el proxy de base de datos de Neon local en contenedores, evitando dependencias locales en el sistema operativo del host.
+*   **Decisión:** 
+    *   Se creó un [Dockerfile](file:///home/joel/Proyectos%20Full-Stack/reports/backend/Dockerfile) utilizando construcción multi-stage con la imagen oficial de Docker Hub `docker.io/library/node:24-alpine3.24` tanto para construcción como para ejecución.
+    *   Se habilitó `corepack` para manejar la instalación de dependencias reproducible mediante `pnpm` con su lockfile.
+    *   Se incorporó el servicio `node` en [docker-compose.yml](file:///home/joel/Proyectos%20Full-Stack/reports/backend/docker-compose.yml), explicitando el dominio del registro `docker.io/` en todas las imágenes de los servicios (`node` y `postgres`) y aislando `node_modules` en volúmenes internos.
+*   **Consecuencias:**
+    *   **Positivas:** Paridad de entornos de ejecución de dependencias, compilación aislada con pnpm corepack, y declaración explícita de registros de imágenes (`docker.io`) para evitar ambigüedades.
+    *   **Negativas:** Mayor tiempo de compilación inicial de la imagen en la máquina de desarrollo (mitigado con la caché de capas de Docker).
+
+---
+
 
 ## 📋 Tareas Pendientes e Hitos Inmediatos
 - [x] Crear el archivo `.env` local real y configurar `JWT_SECRET` y la API Key de Neon.

@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: neondatabase/neon_local:v1.5
+    image: docker.io/neondatabase/neon_local:v1.5
     container_name: reports-neon-local
     restart: always
     ports:
@@ -9,4 +9,24 @@ services:
       NEON_API_KEY: ${NEON_API_KEY}
       NEON_PROJECT_ID: ${NEON_PROJECT_ID}
       PARENT_BRANCH_ID: ${PARENT_BRANCH_ID:-main}
+
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: docker.io/library/node:24-alpine3.24
+    container_name: reports-backend-node
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://neon:npg@postgres:5432/neondb
+      - NODE_ENV=development
+    depends_on:
+      - postgres
 
