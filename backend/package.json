@@ -29,11 +29,11 @@
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@types/node": "^25.9.3",
+        "@types/node": "^25.9.4",
         "@vercel/node": "^5.8.17",
         "drizzle-kit": "^0.31.10",
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
-        "vercel": "^54.14.2"
+        "vercel": "^54.14.5"
     }
 }
