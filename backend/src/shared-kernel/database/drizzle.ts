@@ -1,8 +1,13 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
 
-// Asegúrate de usar la URL de conexión directa que te da Vercel
-const sql = neon(process.env.DATABASE_URL!);
+// Configuración del pool de conexiones usando el driver estándar TCP 'pg'
+// Esto nos garantiza soporte completo de transacciones interactivas,
+// compatibilidad con PgBouncer (local y producción) y elimina problemas de certificados SSL locales.
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL!,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+});
 
-// Instancia de Drizzle optimizada para HTTP Serverless
-export const db = drizzle(sql);
+// Exportar la instancia de Drizzle optimizada para TCP y transacciones
+export const db = drizzle(pool);
