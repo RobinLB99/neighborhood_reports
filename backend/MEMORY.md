@@ -6,7 +6,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 📅 Estado y Contexto General
 *   **Fecha de Creación:** 20 de Junio, 2026
-*   **Última Actualización:** 20 de Junio, 2026 (por Jarvis - Senior Software Architect)
+*   **Última Actualización:** 23 de Junio, 2026 (por Jarvis - Senior Software Architect)
 *   **Entorno Principal:** Node.js (Vercel Serverless Functions) con TypeScript
 *   **Arquitectura:** Concentrada en capas concéntricas (Dominio, Aplicación, Infraestructura) siguiendo Hexagonal, Clean y Screaming Architecture (detallado en [architecture.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/architecture.md)).
 
@@ -26,8 +26,40 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ---
 
+## 🛡️ Decisiones de Seguridad
+
+### 1. Implementación de Vercel Edge Middleware Global (`middleware.ts`)
+*   **Contexto:** Necesitamos un mecanismo global de seguridad rápido para bloquear peticiones con tokens inválidos o expirados antes de que alcancen las funciones serverless de Node.js.
+*   **Decisión:** Se implementó la Alternativa 1 (Vercel Edge Middleware) en la raíz del proyecto.
+*   **Implementación:**
+    *   Valida firmas JWT en el Edge runtime usando la biblioteca ligera `jose`.
+    *   Mantiene una lista blanca de rutas públicas (`PUBLIC_PATHS`) en `middleware.ts`.
+    *   Inyecta el contexto de identidad verificado en las cabeceras HTTP (`x-user-id`, `x-user-role`, `x-user-barrio-id`).
+    *   Se creó el helper `getAuthenticatedUser(request)` en `src/shared-kernel/http/auth.ts` para facilitar su extracción segura y tipada en las funciones de la capa de entrada.
+*   **Consecuencias:**
+    *   **Positivas:** Detiene peticiones no autorizadas en la frontera de la red global de Vercel sin consumir cómputo de backend (mitiga cold starts e innecesarias conexiones a BD).
+    *   **Negativas:** Obliga a gestionar las excepciones de rutas públicas de forma centralizada en `middleware.ts`. Si se agrega un endpoint protegido pero se olvida declararlo en el middleware, el helper lanzará error 500 debido a cabeceras faltantes.
+
+### 3. Documentación Inline mediante Estándar TSDoc/JSDoc
+*   **Contexto:** Los desarrolladores y sistemas automatizados requieren comprender con rapidez las responsabilidades arquitectónicas, contratos de entrada/salida y posibles excepciones sin tener que leer toda la lógica imperativa.
+*   **Decisión:** Se documentó en código fuente los componentes clave (Middlewares, Driving Adapters, Use Cases y Domain Entities) utilizando comentarios en bloque JSDoc/TSDoc estructurados.
+*   **Implementación:**
+    *   Se especificaron flujos lógicos, parámetros `@param`, tipos de retorno `@returns` y excepciones lanzadas `@throws` en todos los archivos del núcleo y límites del backend.
+*   **Consecuencias:**
+    *   **Positivas:** Mejora la mantenibilidad, facilita el onboarding de nuevos colaboradores y habilita la autogeneración automática de documentación de APIs y componentes del sistema.
+    *   **Negativas:** Incremento marginal en el tamaño de las líneas de código, aunque irrelevante para el empaquetado final tras la transpilación a JavaScript.
+
+---
+
+
 ## 📋 Tareas Pendientes e Hitos Inmediatos
-- [ ] Crear el archivo `.env` local real a partir de `.env.example` y configurar la API Key de Neon.
-- [ ] Levantar el contenedor local con `docker compose up` y verificar que el proxy de Neon inicie correctamente.
-- [ ] Ejecutar migraciones Drizzle en el entorno local de desarrollo para poblar la rama efímera.
+- [x] Crear el archivo `.env` local real y configurar `JWT_SECRET` y la API Key de Neon.
+- [x] Levantar el proxy local en Docker de Neon (`neon_local:v1.5`) usando credenciales estáticas `neon:npg`.
+- [x] Ejecutar migraciones Drizzle en el entorno local de desarrollo para poblar la rama efímera.
+- [x] Diseñar e implementar el script de sembrado de territorio (`pnpm db:seed`) con más de 100 barrios de Guayaquil.
+- [x] Desarrollar, desplegar y validar los casos de uso y endpoints del dominio `authentication` (`login` y `me`).
+- [x] Redactar la documentación técnica del backend, APIs y middlewares en [api-and-source-documentation.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/docs/api-and-source-documentation.md).
 - [ ] Continuar estructurando las capas concéntricas de los dominios (`worker-profile`, `identity-validation`, etc.).
+
+
+
