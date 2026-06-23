@@ -69,6 +69,11 @@ To guarantee interface scalability and long-term maintainability:
 
 * **Style Agnosticism:** Component structure and logic must never be exclusively coupled to a single CSS framework (such as Tailwind CSS or Bootstrap).
 * **Abstraction:** Utility classes must be able to be easily interchanged, updated, or refactored without rewriting internal logic or the interactive behavior of the component.
+* **Strict Alignment with Design System (`DESIGN.md`):** Every UI component, layout, color token, spacing scale, typography, and interactive state MUST strictly comply with the guidelines defined in DESIGN.md.
+  * **Achromatic Constraint:** Never introduce chromatic colors. The design is strictly monochromatic (chalk, graphite, carbon, concrete, hairline, mist).
+  * **Border-First Design:** Avoid using box shadows for elevation. Use hairline borders (`#e5e5e5` / `--color-hairline`) to separate layouts and cards.
+  * **Accessibility First:** Ensure touch target guardrails (minimum of 44px) are strictly respected. For visually smaller interactive elements, use invisible CSS expansion selectors (`::before`/`::after`) to reach the target size.
+
 
 ---
 
