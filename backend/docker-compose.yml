@@ -8,7 +8,7 @@ services:
     environment:
       NEON_API_KEY: ${NEON_API_KEY}
       NEON_PROJECT_ID: ${NEON_PROJECT_ID}
-      PARENT_BRANCH_ID: ${PARENT_BRANCH_ID:-main}
+      PARENT_BRANCH_ID: ${PARENT_BRANCH_ID}
 
   node:
     build:
