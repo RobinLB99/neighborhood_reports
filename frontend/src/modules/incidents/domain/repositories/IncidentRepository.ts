@@ -1,4 +1,5 @@
 import type { Incident } from '../entities/Incident';
+import type { SupportStats, ToggleSupportResult } from '../entities/SupportStats';
 
 export interface IncidentRepository {
   createIncident(
@@ -8,4 +9,8 @@ export interface IncidentRepository {
   ): Promise<Incident>;
 
   getActiveIncidents(apiUrl: string, token: string): Promise<Incident[]>;
+
+  getIncidentSupports(apiUrl: string, token: string, incidentId: number): Promise<SupportStats>;
+  toggleIncidentSupport(apiUrl: string, token: string, incidentId: number): Promise<ToggleSupportResult>;
 }
+

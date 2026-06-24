@@ -109,6 +109,15 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Seguridad absoluta por diseño contra IDOR (ningún usuario puede listar reportes de otros barrios). Alta velocidad al procesar filtros en base de datos. Consistencia con la arquitectura hexagonal.
     *   **Negativas:** Obliga a que el usuario posea un `barrioId` asociado en su JWT.
 
+### 6. Implementación de Apoyos (Likes/Corazones) en Reportes (GET y POST /api/incidents/[id]/supports)
+*   **Contexto:** Los usuarios del frontend requieren poder apoyar (dar me gusta / corazón) a incidencias específicas. Se necesita registrar este apoyo en base de datos y obtener estadísticas de manera segura e independiente.
+*   **Decisión:** Crear una ruta dinámica única `/api/incidents/[id]/supports` administrando los dos verbos HTTP solicitados:
+    *   `POST`: Realiza un "toggle" (alterna entre agregar y quitar apoyo) en base a la existencia previa del registro para el usuario autenticado y el ID del reporte.
+    *   `GET`: Devuelve el conteo de apoyos en formato entero (`count`) y si el usuario actual ha apoyado la incidencia (`hasSupported`).
+*   **Consecuencias:**
+    *   **Positivas:** Reducción de la latencia y volumen de empaquetado para funciones serverless en Vercel al consolidar la lógica de apoyos en un único handler dinámico. Desacoplamiento de negocio en puertos/casos de uso separados (`ToggleIncidentSupportUseCase` y `GetIncidentSupportsUseCase`).
+    *   **Negativas:** Ninguna.
+
 ---
 
 ## 🐳 Decisiones de Infraestructura y Contenedores

@@ -10,6 +10,7 @@ import { GetNeighborhoodsSchema } from "../../territory/application/dtos/GetNeig
 import { NeighborsResponseSchema } from "../../authentication/application/dtos/GetNeighborsDto.js";
 import { CommitteeMembersListResponseSchema } from "../../committee/application/dtos/GetCommitteeMembersDto.js";
 import { CreateReportPayloadSchema } from "../../incidents/domain/entities/Reporte.js";
+import { IncidentSupportParamsSchema, SupportStatsResponseSchema } from "../../incidents/domain/entities/Apoyo.js";
 
 
 export const registry = new OpenAPIRegistry();
@@ -562,6 +563,86 @@ registry.registerPath({
     },
     401: {
       description: "No autorizado o token JWT inválido.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+// Registrar esquemas de apoyos
+const ToggleSupportResponseSchema = registry.register("ToggleSupportResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    supported: z.boolean(),
+  }),
+}));
+
+const SupportStatsResponseSchemaRegistered = registry.register(
+  "SupportStatsResponse",
+  SupportStatsResponseSchema
+);
+
+// Registrar rutas de apoyos
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/{id}/supports",
+  summary: "Alternar apoyo a reporte (Corazón)",
+  description: "Registra o elimina un apoyo (like) en el reporte especificado por ID para el usuario autenticado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: IncidentSupportParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Apoyo alternado con éxito.",
+      content: {
+        "application/json": {
+          schema: ToggleSupportResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido o erróneo.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/{id}/supports",
+  summary: "Obtener estadísticas de apoyos de un reporte",
+  description: "Recupera la cantidad total de apoyos y si el usuario autenticado lo ha apoyado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: IncidentSupportParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Estadísticas de apoyos recuperadas con éxito.",
+      content: {
+        "application/json": {
+          schema: SupportStatsResponseSchemaRegistered,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido o erróneo.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
     },
     500: {
       description: "Error interno del servidor.",

@@ -98,4 +98,42 @@ export class DrizzleIncidentRepository implements IncidentRepository {
       throw new Error(`[Database Infrastructure Error]: ${error.message || "Fallo de consulta desconocido."}`);
     }
   }
+
+  /**
+   * Busca un reporte activo por su ID en la base de datos utilizando Drizzle ORM.
+   * 
+   * @param id ID del reporte a buscar.
+   * @returns La entidad de dominio Reporte o null si no se encuentra.
+   * @throws Error si ocurre un fallo al consultar en la persistencia.
+   */
+  async findById(id: number): Promise<Reporte | null> {
+    try {
+      const [row] = await db
+        .select()
+        .from(reportes)
+        .where(and(eq(reportes.id, id), eq(reportes.activo, true)))
+        .limit(1);
+
+      if (!row) {
+        return null;
+      }
+
+      return new Reporte(
+        row.id,
+        row.usuarioId,
+        row.barrioId,
+        row.direccion,
+        row.ubicacion,
+        row.fotoUrl,
+        row.estado as any,
+        row.descripcion,
+        row.activo ?? undefined,
+        row.fechaCreacion ?? undefined,
+        row.fechaActualizacion ?? undefined
+      );
+    } catch (error: any) {
+      console.error("[Database Error] Error al buscar reporte por ID:", error);
+      throw new Error(`[Database Infrastructure Error]: ${error.message || "Fallo de consulta por ID desconocido."}`);
+    }
+  }
 }

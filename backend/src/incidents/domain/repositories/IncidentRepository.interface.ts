@@ -22,4 +22,12 @@ export interface IncidentRepository {
    * @returns Listado de entidades de dominio Reporte.
    */
   listActiveReportsByBarrio(barrioId: number): Promise<Reporte[]>;
+
+  /**
+   * Busca un reporte por su ID.
+   * 
+   * @param id ID del reporte.
+   * @returns La entidad de dominio Reporte o null si no se encuentra.
+   */
+  findById(id: number): Promise<Reporte | null>;
 }

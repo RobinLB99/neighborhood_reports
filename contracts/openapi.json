@@ -523,6 +523,56 @@
           "message",
           "data"
         ]
+      },
+      "ToggleSupportResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "supported": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "supported"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "SupportStatsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number"
+              },
+              "hasSupported": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "count",
+              "hasSupported"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
       }
     },
     "parameters": {}
@@ -1108,6 +1158,98 @@
           },
           "401": {
             "description": "No autorizado o token JWT inválido."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/{id}/supports": {
+      "post": {
+        "summary": "Alternar apoyo a reporte (Corazón)",
+        "description": "Registra o elimina un apoyo (like) en el reporte especificado por ID para el usuario autenticado.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Apoyo alternado con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToggleSupportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido o erróneo."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      },
+      "get": {
+        "summary": "Obtener estadísticas de apoyos de un reporte",
+        "description": "Recupera la cantidad total de apoyos y si el usuario autenticado lo ha apoyado.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estadísticas de apoyos recuperadas con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportStatsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido o erróneo."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
           },
           "500": {
             "description": "Error interno del servidor."

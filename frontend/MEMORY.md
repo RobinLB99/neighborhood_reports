@@ -41,8 +41,15 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Capa UI e Isla Reactiva (Preact):** Se implementó inicialmente un formato de tabla y luego se rediseñó a un formato de feed vertical tipo red social (`IncidentsFeed.tsx`) para una visualización más moderna e interactiva de incidencias.
         *   **Características del Feed:** Cada tarjeta (`article`) cuenta con badges minimalistas de estado (píldoras con radio de 26px), descripción en Geist con espaciado optimizado, medios en formato responsivo (`aspect-video`) con zoom en modal de pantalla completa, y un pie con la dirección del reporte y un enlace interactivo de altura accesible (45px) a Google Maps para geolocalización física real.
         *   **Limpieza de Deuda Técnica:** Se eliminó por completo el componente antiguo `IncidentsTable.tsx` una vez integrado y verificado el feed en `Dashboard.tsx` mediante `pnpm build`.
+6.  **Botón de Apoyos (Corazón) a Incidencias en Mural [2026-06-24]:**
+    *   *Impacto técnico:*
+        *   **Capa Dominio:** Creación de la entidad `SupportStats` y modificación de la interfaz `IncidentRepository` para declarar los contratos `getIncidentSupports` y `toggleIncidentSupport`.
+        *   **Capa Infraestructura:** Implementación de adaptadores en `HttpIncidentRepository` apuntando a los endpoints `/api/incidents/{id}/supports` (`GET` y `POST`).
+        *   **Capa Aplicación:** Creación de los casos de uso `GetIncidentSupportsUseCase` y `ToggleIncidentSupportUseCase`.
+        *   **Capa UI e Isla Reactiva (Preact):** Diseño de `IncidentSupportButton.tsx` con manejo de estados asíncronos y actualizaciones optimistas automáticas (con rollback ante fallos en red). Alojado de forma aislada en el feed para evitar re-renderizaciones globales innecesarias. Cumple con los requisitos monocromáticos de `DESIGN.md` e interacción mínima accesible de `44px`.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
 2.  **Validación de Estados de Foco y Contraste:** Asegurar que los componentes interactivos utilicen indicadores de enfoque altamente visibles que cumplan con la relación de contraste **3:1** (WCAG 1.4.11) sobre fondo blanco.
+
 

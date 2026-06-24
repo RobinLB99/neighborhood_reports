@@ -2,6 +2,8 @@ import { useEffect, useState } from 'preact/hooks';
 import { GetActiveIncidentsUseCase } from '../application/use-cases/GetActiveIncidentsUseCase';
 import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
 import type { Incident } from '../domain/entities/Incident';
+import IncidentSupportButton from './IncidentSupportButton';
+
 
 interface Props {
   apiUrl: string;
@@ -169,19 +171,23 @@ export default function IncidentsFeed({ apiUrl, token }: Props) {
                     {incident.direccion}
                   </span>
                 </div>
-                {incident.ubicacion && (
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${incident.ubicacion}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="shrink-0 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-graphite border border-hairline rounded-lg px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] w-full sm:w-auto"
-                  >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                    </svg>
-                    Ver en Google Maps
-                  </a>
-                )}
+                <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                  <IncidentSupportButton apiUrl={apiUrl} token={token} incidentId={incident.id} />
+                  {incident.ubicacion && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${incident.ubicacion}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="shrink-0 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-graphite border border-hairline rounded-lg px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] flex-1 sm:flex-initial"
+                    >
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                      Ver en Google Maps
+                    </a>
+                  )}
+                </div>
+
               </div>
             </article>
           ))}

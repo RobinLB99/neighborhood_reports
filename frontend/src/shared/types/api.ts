@@ -855,6 +855,128 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/incidents/{id}/supports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener estadísticas de apoyos de un reporte
+         * @description Recupera la cantidad total de apoyos y si el usuario autenticado lo ha apoyado.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Estadísticas de apoyos recuperadas con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SupportStatsResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido o erróneo. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Alternar apoyo a reporte (Corazón)
+         * @description Registra o elimina un apoyo (like) en el reporte especificado por ID para el usuario autenticado.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Apoyo alternado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ToggleSupportResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido o erróneo. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -988,6 +1110,19 @@ export interface components {
                 fechaCreacion?: string;
                 fechaActualizacion?: string;
             }[];
+        };
+        ToggleSupportResponse: {
+            message: string;
+            data: {
+                supported: boolean;
+            };
+        };
+        SupportStatsResponse: {
+            message: string;
+            data: {
+                count: number;
+                hasSupported: boolean;
+            };
         };
     };
     responses: never;

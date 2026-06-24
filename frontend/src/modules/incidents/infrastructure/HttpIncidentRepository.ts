@@ -1,5 +1,6 @@
 import type { IncidentRepository } from '../domain/repositories/IncidentRepository';
 import type { Incident } from '../domain/entities/Incident';
+import type { SupportStats, ToggleSupportResult } from '../domain/entities/SupportStats';
 
 export class HttpIncidentRepository implements IncidentRepository {
   async createIncident(
@@ -42,4 +43,41 @@ export class HttpIncidentRepository implements IncidentRepository {
     const json = await res.json();
     return json.data as Incident[];
   }
+
+  async getIncidentSupports(apiUrl: string, token: string, incidentId: number): Promise<SupportStats> {
+    const res = await fetch(`${apiUrl}/api/incidents/${incidentId}/supports`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || 'Error al obtener los apoyos del reporte.');
+    }
+
+    const json = await res.json();
+    return json.data as SupportStats;
+  }
+
+  async toggleIncidentSupport(apiUrl: string, token: string, incidentId: number): Promise<ToggleSupportResult> {
+    const res = await fetch(`${apiUrl}/api/incidents/${incidentId}/supports`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || 'Error al modificar el apoyo del reporte.');
+    }
+
+    const json = await res.json();
+    return json.data as ToggleSupportResult;
+  }
 }
+
