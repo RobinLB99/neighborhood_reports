@@ -1,7 +1,7 @@
 # Memoria de Contexto del Proyecto — Frontend de Reportes de Vecindario
 
 ## Información General
-*   **Fecha de Última Actualización:** 2026-06-22
+*   **Fecha de Última Actualización:** 2026-06-24
 *   **Arquitecto a Cargo:** Jarvis (AI Senior Software Architect)
 
 ## Estado de la Arquitectura
@@ -18,6 +18,12 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   Garantía de objetivo de toque mínimo de **44px** (`2.75rem`) para botones y campos interactivos, junto con pautas de expansión invisible mediante pseudoelementos CSS para componentes más pequeños (como badges o tags).
         *   Aumento de la separación entre elementos interactivos (gaps mínimos de `12px` / `0.75rem`) para mitigar toques erróneos.
         *   Relajación de la altura de línea de display a `1.25` y del cuerpo a `1.50` para evitar colisión tipográfica (cumplimiento WCAG 1.4.12).
+2.  **Redirección y Validación de Sesión Unificada [2026-06-24]:**
+    *   *Impacto técnico:*
+        *   Se reemplazó la vista de bienvenida de Astro en `index.astro` por una redirección limpia a `/dashboard`.
+        *   Se implementó el custom hook centralizado `useAuth` (`src/modules/auth/application/useAuth.ts`) que gestiona el estado de sesión (`localStorage`, validación de token y logout) y actúa como guardián de rutas redirigiendo a `/login` en caso de sesión inválida.
+        *   Se refactorizó el componente `Dashboard` para consumir la sesión mediante este hook (`useAuth({ requireAuth: true })`).
+
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.

@@ -1,55 +1,12 @@
-import { useEffect, useState } from 'preact/hooks';
-
-interface User {
-  id: number;
-  nombre: string;
-  usuario: string;
-  rol: string;
-  barrioId: number | null;
-}
+import useAuth from '@modules/auth/application/useAuth';
 
 interface Props {
   apiUrl: string;
 }
 
 export default function Dashboard({ apiUrl }: Props) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, logout } = useAuth({ apiUrl, requireAuth: true });
 
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-
-    if (!token) {
-      window.location.href = '/login';
-      return;
-    }
-
-    fetch(`${apiUrl}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (res.status === 401) {
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('auth_user');
-          window.location.href = '/login';
-          return null;
-        }
-        return res.json();
-      })
-      .then((json) => {
-        if (json) setUser(json.data);
-      })
-      .catch(() => {
-        window.location.href = '/login';
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  function logout() {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_user');
-    window.location.href = '/login';
-  }
 
   if (loading) {
     return (
