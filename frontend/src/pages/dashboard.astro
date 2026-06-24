@@ -1,0 +1,10 @@
+---
+import Layout from '@shared/layouts/Layout.astro';
+import Dashboard from '@modules/dashboard/Dashboard';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
+---
+
+<Layout title="Dashboard — Reportes Barriales">
+  <Dashboard client:load apiUrl={apiUrl} />
+</Layout>

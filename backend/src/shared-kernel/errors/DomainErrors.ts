@@ -51,3 +51,22 @@ export class UserNotFoundError extends DomainError {
   }
 }
 
+export class ProvinceNotFoundError extends DomainError {
+  constructor(provinceId: number) {
+    super(
+      `La provincia con ID ${provinceId} no existe en el sistema.`,
+      "PROVINCE_NOT_FOUND"
+    );
+  }
+}
+
+export class CityNotFoundError extends DomainError {
+  constructor(cityId: number) {
+    super(
+      `La ciudad con ID ${cityId} no existe en el sistema.`,
+      "CITY_NOT_FOUND"
+    );
+  }
+}
+
+
