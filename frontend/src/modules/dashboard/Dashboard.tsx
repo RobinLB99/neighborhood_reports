@@ -82,6 +82,18 @@ export default function Dashboard({ apiUrl }: Props) {
           </div>
         )}
       </main>
+
+      {user.barrioId && (
+        <a
+          href="/dashboard/reportar"
+          class="fixed bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 bg-graphite text-chalk rounded-full flex items-center justify-center shadow-lg hover:bg-carbon hover:-translate-y-1 hover:shadow-xl transition-all duration-300 z-50 group"
+          aria-label="Reportar nueva incidencia"
+        >
+          <svg class="w-6 h-6 transition-transform group-hover:rotate-90 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+        </a>
+      )}
     </div>
   );
 }

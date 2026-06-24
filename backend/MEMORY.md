@@ -6,7 +6,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 📅 Estado y Contexto General
 *   **Fecha de Creación:** 20 de Junio, 2026
-*   **Última Actualización:** 23 de Junio, 2026 (por Jarvis - Senior Software Architect)
+*   **Última Actualización:** 24 de Junio, 2026 (por Jarvis - Senior Software Architect)
 *   **Entorno Principal:** Node.js (Vercel Serverless Functions) con TypeScript
 *   **Arquitectura:** Concentrada en capas concéntricas (Dominio, Aplicación, Infraestructura) siguiendo Hexagonal, Clean y Screaming Architecture (detallado en [architecture.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/architecture.md)).
 
@@ -50,6 +50,16 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Desacoplamiento total entre el dominio de autenticación (`authentication`) y el de comités (`committee`). El endpoint devuelve un código HTTP `403 Forbidden` con error estructurado si la validación falla.
     *   **Negativas:** Ninguna.
 
+### 4. Implementación del Flujo de Creación de Reportes Ciudadanos e Incidencias (Signed Uploads)
+*   **Contexto:** El backend necesita permitir a cualquier ciudadano reportar incidencias locales adjuntando evidencias fotográficas pesadas. Procesar imágenes directamente en las funciones serverless de Vercel está sujeto a límites estrictos de payload (4.5MB en Vercel) y degrada el rendimiento de arranque frío (Cold Starts) debido al parsing binario.
+*   **Decisión:** 
+    *   **Subidas Firmadas (Signed Uploads) - Opción B:** Implementar un endpoint transversal `/api/storage/signature` que provee firmas criptográficas HMAC-SHA1 generadas de forma segura en el backend (`CloudinaryImageUploader`) usando la API key privada. Esto faculta al frontend a subir las imágenes directamente a Cloudinary saltándose el límite de Vercel.
+    *   **Validación de Ubicación por Regex:** Validar las coordenadas enviadas mediante Zod Regex (`/^-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?$/`) para forzar un formato estricto `"latitud,longitud"` (ej. `"-2.145, -79.888"`) antes de persistir en PostgreSQL.
+    *   **Desacoplamiento Puro:** Encapsular la creación de incidencias en `CreateReportUseCase` inyectando manualmente el puerto `IncidentRepository` (implementado por `DrizzleIncidentRepository`).
+*   **Consecuencias:**
+    *   **Positivas:** Inmunidad ante límites físicos de payload en Vercel. Rápido procesamiento e inserción de datos limpios. Cero dependencias de infraestructura en el caso de uso.
+    *   **Negativas:** Aumenta la complejidad en el cliente, el cual ahora debe orquestar el flujo en tres pasos: obtener firma, subir a Cloudinary, y enviar el payload con la URL final al endpoint de creación de reportes.
+
 ---
 
 ## 🛡️ Decisiones de Seguridad
@@ -66,7 +76,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Detiene peticiones no autorizadas en la frontera de la red global de Vercel sin consumir cómputo de backend (mitiga cold starts e innecesarias conexiones a BD).
     *   **Negativas:** Obliga a gestionar las excepciones de rutas públicas de forma centralizada en `middleware.ts`. Si se agrega un endpoint protegido pero se olvida declararlo en el middleware, el helper lanzará error 500 debido a cabeceras faltantes.
 
-### 3. Documentación Inline mediante Estándar TSDoc/JSDoc
+### 2. Documentación Inline mediante Estándar TSDoc/JSDoc
 *   **Contexto:** Los desarrolladores y sistemas automatizados requieren comprender con rapidez las responsabilidades arquitectónicas, contratos de entrada/salida y posibles excepciones sin tener que leer toda la lógica imperativa.
 *   **Decisión:** Se documentó en código fuente los componentes clave (Middlewares, Driving Adapters, Use Cases y Domain Entities) utilizando comentarios en bloque JSDoc/TSDoc estructurados.
 *   **Implementación:**
@@ -75,7 +85,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Mejora la mantenibilidad, facilita el onboarding de nuevos colaboradores y habilita la autogeneración automática de documentación de APIs y componentes del sistema.
     *   **Negativas:** Incremento marginal en el tamaño de las líneas de código, aunque irrelevante para el empaquetado final tras la transpilación a JavaScript.
 
-### 2. Generación Automatizada del Contrato OpenAPI (`scripts/generate-openapi.ts`)
+### 3. Generación Automatizada del Contrato OpenAPI (`scripts/generate-openapi.ts`)
 *   **Contexto:** Se requiere mantener sincronizado el contrato OpenAPI con los schemas de validación Zod existentes en el backend para que el frontend pueda auto-generar tipos y clientes de forma automatizada y sin acoplamiento directo.
 *   **Decisión:** Implementar un compilador de especificación dinámico utilizando `@asteasolutions/zod-to-openapi` e instanciar un registro central en `shared-kernel`.
 *   **Implementación:**
@@ -85,7 +95,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Contrato OpenAPI autogenerado y siempre fiel a las reglas de validación en tiempo de ejecución. El frontend puede tiparse de forma 100% independiente.
     *   **Negativas:** Añade una dependencia de desarrollo adicional (`@asteasolutions/zod-to-openapi`) y requiere registrar de forma explícita cada ruta y DTO nuevo en el `registry`.
 
-### 3. Consulta Segura de Vecinos del Barrio (GET /api/users/neighbors)
+### 4. Consulta Segura de Vecinos del Barrio (GET /api/users/neighbors)
 *   **Contexto:** Los líderes del comité necesitan un listado de vecinos elegibles de su propio barrio para promoverlos a cargos directivos. El frontend no debe enviar el `barrioId` de manera explícita para evitar vulnerabilidades de escalación o fuga de datos (IDOR).
 *   **Decisión:** Crear un endpoint protegido por el middleware JWT que extraiga dinámicamente el `barrioId` del contexto decodificado (`x-user-barrio-id`) y delegue en el caso de uso `GetNeighborsUseCase`. El acceso está restringido exclusivamente a roles `lider` y `miembro`.
 *   **Consecuencias:**
@@ -130,7 +140,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 - [x] Desarrollar, desplegar y validar los casos de uso y endpoints del dominio `authentication` (`login` y `me`).
 - [x] Redactar la documentación técnica del backend, APIs y middlewares en [api-and-source-documentation.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/docs/api-and-source-documentation.md).
 - [x] Diseñar e implementar el flujo público y atómico de alta para líderes y comités barriales (ADR 0004).
+- [x] Refactorizar la base de datos y esquema de incidentes para utilizar restricciones SQL `CHECK` en el campo `estado` (VARCHAR).
+- [x] Diseñar e implementar el flujo de subidas firmadas a Cloudinary e insertar reportes ciudadanos (`POST /api/incidents/create`).
+- [ ] Implementar la consulta y listado de reportes barriales activos (`GET /api/incidents/list`).
 - [ ] Continuar estructurando las capas concéntricas de los dominios (`worker-profile`, `identity-validation`, etc.).
-
-
-

@@ -676,6 +676,132 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/storage/signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener firma para subida directa de imágenes
+         * @description Genera una firma criptográfica para permitir al frontend subir imágenes directamente a Cloudinary.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Carpeta de destino en Cloudinary */
+                    folder?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Firma de Cloudinary generada con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StorageSignatureResponse"];
+                    };
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/incidents/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Crear reporte de incidencia
+         * @description Permite registrar un reporte de incidencia ciudadana en el barrio del usuario autenticado.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        direccion: string;
+                        ubicacion: string;
+                        /** Format: uri */
+                        fotoUrl: string;
+                        descripcion: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Reporte de incidencia registrado exitosamente. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateReportResponse"];
+                    };
+                };
+                /** @description El payload enviado contiene errores de validación. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -770,6 +896,30 @@ export interface components {
                 usuario: string;
                 fechaRegistro?: string;
             }[];
+        };
+        StorageSignatureResponse: {
+            message: string;
+            data: {
+                signature: string;
+                timestamp: number;
+                folder: string;
+                apiKey: string;
+                cloudName: string;
+            };
+        };
+        CreateReportResponse: {
+            message: string;
+            data: {
+                id: number;
+                usuarioId: number;
+                barrioId: number;
+                direccion: string;
+                ubicacion: string;
+                fotoUrl: string;
+                estado: string;
+                descripcion: string;
+                fechaCreacion?: string;
+            };
         };
     };
     responses: never;

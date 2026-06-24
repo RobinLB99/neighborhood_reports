@@ -9,6 +9,8 @@ import { GetCitiesSchema } from "../../territory/application/dtos/GetCitiesDto.j
 import { GetNeighborhoodsSchema } from "../../territory/application/dtos/GetNeighborhoodsDto.js";
 import { NeighborsResponseSchema } from "../../authentication/application/dtos/GetNeighborsDto.js";
 import { CommitteeMembersListResponseSchema } from "../../committee/application/dtos/GetCommitteeMembersDto.js";
+import { CreateReportPayloadSchema } from "../../incidents/domain/entities/Reporte.js";
+
 
 export const registry = new OpenAPIRegistry();
 
@@ -431,5 +433,99 @@ registry.registerPath({
     },
   },
 });
+
+// Nuevos esquemas para firmas de almacenamiento e incidencias
+const StorageSignatureResponseSchema = registry.register("StorageSignatureResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    signature: z.string(),
+    timestamp: z.number(),
+    folder: z.string(),
+    apiKey: z.string(),
+    cloudName: z.string(),
+  }),
+}));
+
+const CreateReportResponseSchema = registry.register("CreateReportResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    id: z.number(),
+    usuarioId: z.number(),
+    barrioId: z.number(),
+    direccion: z.string(),
+    ubicacion: z.string(),
+    fotoUrl: z.string(),
+    estado: z.string(),
+    descripcion: z.string(),
+    fechaCreacion: z.string().optional(),
+  }),
+}));
+
+// Registrar Nuevas Rutas (Endpoints)
+registry.registerPath({
+  method: "get",
+  path: "/api/storage/signature",
+  summary: "Obtener firma para subida directa de imágenes",
+  description: "Genera una firma criptográfica para permitir al frontend subir imágenes directamente a Cloudinary.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    query: z.object({
+      folder: z.string().optional().openapi({ description: "Carpeta de destino en Cloudinary" }),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Firma de Cloudinary generada con éxito.",
+      content: {
+        "application/json": {
+          schema: StorageSignatureResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/create",
+  summary: "Crear reporte de incidencia",
+  description: "Permite registrar un reporte de incidencia ciudadana en el barrio del usuario autenticado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: CreateReportPayloadSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Reporte de incidencia registrado exitosamente.",
+      content: {
+        "application/json": {
+          schema: CreateReportResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "El payload enviado contiene errores de validación.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
 
 
