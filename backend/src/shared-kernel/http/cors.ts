@@ -39,6 +39,9 @@ export function handleCors(req: VercelRequest, res: VercelResponse): boolean {
       "Access-Control-Allow-Headers",
       "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization",
     );
+    // Indica a los caches que la respuesta varía según el origen.
+    // Sin esto, un caché puede servir una respuesta con el ACAO de un origen anterior.
+    res.setHeader("Vary", "Origin");
   }
 
   // Intercepción centralizada del protocolo Preflight (peticiones OPTIONS emitidas por navegadores)
