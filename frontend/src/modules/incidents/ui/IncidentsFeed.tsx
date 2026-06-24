@@ -1,0 +1,225 @@
+import { useEffect, useState } from 'preact/hooks';
+import { GetActiveIncidentsUseCase } from '../application/use-cases/GetActiveIncidentsUseCase';
+import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
+import type { Incident } from '../domain/entities/Incident';
+
+interface Props {
+  apiUrl: string;
+  token: string;
+}
+
+export default function IncidentsFeed({ apiUrl, token }: Props) {
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+
+  const fetchIncidents = () => {
+    setLoading(true);
+    const repository = new HttpIncidentRepository();
+    const useCase = new GetActiveIncidentsUseCase(repository);
+
+    useCase.execute(apiUrl, token)
+      .then((data) => {
+        setIncidents(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message || 'Error al cargar los reportes activos.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchIncidents();
+  }, [apiUrl, token]);
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('es-EC', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div class="py-16 text-center border border-hairline rounded-[14px] bg-chalk mt-10">
+        <div class="inline-block animate-pulse w-6 h-6 border-2 border-concrete border-t-transparent rounded-full mb-3"></div>
+        <p class="text-sm text-concrete font-medium">Cargando mural de reportes...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div class="py-16 px-6 text-center border border-hairline rounded-[14px] bg-chalk mt-10">
+        <div class="w-12 h-12 bg-mist rounded-full flex items-center justify-center mx-auto mb-4 border border-hairline">
+          <svg class="w-6 h-6 text-concrete" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <p class="text-sm text-concrete mb-6 font-medium">{error}</p>
+        <button
+          onClick={fetchIncidents}
+          class="inline-flex items-center justify-center text-xs font-semibold uppercase text-pure-black border border-pure-black rounded-lg px-5 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px]"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div class="mt-10">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-semibold text-graphite tracking-tight">Mural de Reportes</h2>
+          <p class="text-xs text-concrete mt-1">Listado de incidencias activas en tu barrio.</p>
+        </div>
+        <span class="text-xs font-semibold px-3 py-1 border border-hairline bg-mist text-graphite rounded-[26px]">
+          {incidents.length} {incidents.length === 1 ? 'activo' : 'activos'}
+        </span>
+      </div>
+
+      {incidents.length === 0 ? (
+        <div class="py-16 text-center border border-hairline rounded-[14px] bg-chalk">
+          <div class="w-12 h-12 bg-mist rounded-full flex items-center justify-center mx-auto mb-4 border border-hairline">
+            <svg class="w-6 h-6 text-concrete" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <p class="text-sm text-concrete font-medium">No hay incidencias activas en este momento.</p>
+        </div>
+      ) : (
+        <div class="flex flex-col gap-6">
+          {incidents.map((incident) => (
+            <article 
+              key={incident.id} 
+              class="bg-chalk border border-hairline rounded-[14px] p-6 transition-colors hover:border-concrete/30 flex flex-col"
+            >
+              {/* Header: Estado y Identificadores */}
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                  <span
+                    class={`inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 border rounded-[26px] ${
+                      incident.estado === 'pendiente'
+                        ? 'border-ash text-concrete bg-mist'
+                        : 'border-graphite text-graphite bg-chalk'
+                    }`}
+                  >
+                    {incident.estado === 'pendiente' ? 'Pendiente' : 'En Gestión'}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs text-concrete font-mono">
+                  <span>#{incident.id}</span>
+                  <span class="text-hairline">•</span>
+                  <span>{formatDate(incident.fechaCreacion)}</span>
+                </div>
+              </div>
+
+              {/* Body: Descripción */}
+              <div class="mt-4">
+                <p class="text-sm md:text-base text-graphite leading-relaxed font-normal whitespace-pre-wrap">
+                  {incident.descripcion}
+                </p>
+              </div>
+
+              {/* Media: Imagen */}
+              {incident.fotoUrl && (
+                <div class="mt-4 border border-hairline rounded-[10px] overflow-hidden bg-mist">
+                  <button
+                    onClick={() => setSelectedPhoto(incident.fotoUrl)}
+                    class="w-full aspect-video md:aspect-[16/10] focus:outline-none hover:opacity-95 transition-opacity cursor-pointer block relative group"
+                    aria-label="Ver foto a tamaño completo"
+                  >
+                    <img
+                      src={incident.fotoUrl}
+                      alt={`Foto del reporte #${incident.id}`}
+                      class="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div class="absolute inset-0 bg-pure-black/0 group-hover:bg-pure-black/5 transition-colors flex items-center justify-center">
+                      <span class="bg-chalk/90 border border-hairline text-graphite text-xs font-semibold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-sm pointer-events-none">
+                        Ampliar Imagen
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              )}
+
+              {/* Footer: Dirección y Enlace al mapa */}
+              <div class="mt-5 border-t border-hairline pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-start gap-2 text-xs text-concrete min-w-0">
+                  <svg class="w-4 h-4 text-concrete shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span class="truncate leading-relaxed" title={incident.direccion}>
+                    {incident.direccion}
+                  </span>
+                </div>
+                {incident.ubicacion && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${incident.ubicacion}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="shrink-0 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-graphite border border-hairline rounded-lg px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] w-full sm:w-auto"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    Ver en Google Maps
+                  </a>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {/* Modal de foto en tamaño completo */}
+      {selectedPhoto && (
+        <div
+          class="fixed inset-0 bg-pure-black/70 backdrop-blur-xs z-[100] flex items-center justify-center p-4"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <div
+            class="relative max-w-4xl w-full bg-chalk border border-hairline rounded-[14px] overflow-hidden flex flex-col shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div class="flex items-center justify-between px-6 py-4 border-b border-hairline bg-chalk">
+              <span class="text-sm font-semibold text-graphite">Detalle de Fotografía</span>
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                class="text-concrete hover:text-pure-black transition-colors cursor-pointer w-9 h-9 flex items-center justify-center rounded-lg hover:bg-mist min-h-[36px]"
+                aria-label="Cerrar modal"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div class="p-6 flex items-center justify-center bg-mist overflow-hidden min-h-[300px]">
+              <img
+                src={selectedPhoto}
+                alt="Fotografía de la incidencia en tamaño completo"
+                class="max-w-full max-h-[70vh] object-contain rounded-lg border border-hairline bg-chalk"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -5,7 +5,7 @@ export class HttpIncidentRepository implements IncidentRepository {
   async createIncident(
     apiUrl: string,
     token: string,
-    incident: Omit<Incident, 'id' | 'usuarioId' | 'barrioId' | 'estado' | 'fechaCreacion'>
+    incident: Omit<Incident, 'id' | 'usuarioId' | 'barrioId' | 'estado' | 'fechaCreacion' | 'fechaActualizacion'>
   ): Promise<Incident> {
     const res = await fetch(`${apiUrl}/api/incidents/create`, {
       method: 'POST',
@@ -23,5 +23,23 @@ export class HttpIncidentRepository implements IncidentRepository {
 
     const json = await res.json();
     return json.data as Incident;
+  }
+
+  async getActiveIncidents(apiUrl: string, token: string): Promise<Incident[]> {
+    const res = await fetch(`${apiUrl}/api/incidents/list`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || 'Error al obtener los reportes del servidor.');
+    }
+
+    const json = await res.json();
+    return json.data as Incident[];
   }
 }

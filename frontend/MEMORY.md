@@ -35,7 +35,14 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Geolocalización y Mapa:** Se integró la librería Leaflet con mapas base de OpenStreetMap dentro de la isla reactiva de Preact `ReportIncidentForm.tsx`, permitiendo seleccionar coordenadas exactas (`latitud,longitud`) de forma visual e intuitiva y/o usar geolocalización nativa del navegador.
         *   **Floating Action Button (FAB):** Se agregó un botón flotante con el ícono `+` en el `Dashboard` (`Dashboard.tsx`) anclado en `fixed bottom-6 right-6` para acceso rápido y limpio al reporte, removiendo el banner estático redundante que ocupaba espacio visual principal.
         *   **Manejo de Errores y Tolerancia a Fallos:** Se encapsularon los errores en excepciones de dominio y se implementó una máquina de estados visual (`useIncidentForm`) que preserva la imagen pre-subida si falla el paso final, evitando la redundancia de red al reintentar el registro.
+5.  **Mural de Reportes Barriales y Rediseño a Social Feed [2026-06-24]:**
+    *   *Impacto técnico:*
+        *   **Arquitectura Hexagonal (Dominio, Aplicación, Infraestructura):** Se agregaron los contratos y la implementación HTTP de `getActiveIncidents` en `IncidentRepository.ts` y `HttpIncidentRepository.ts`, coordinados por el caso de uso `GetActiveIncidentsUseCase.ts`.
+        *   **Capa UI e Isla Reactiva (Preact):** Se implementó inicialmente un formato de tabla y luego se rediseñó a un formato de feed vertical tipo red social (`IncidentsFeed.tsx`) para una visualización más moderna e interactiva de incidencias.
+        *   **Características del Feed:** Cada tarjeta (`article`) cuenta con badges minimalistas de estado (píldoras con radio de 26px), descripción en Geist con espaciado optimizado, medios en formato responsivo (`aspect-video`) con zoom en modal de pantalla completa, y un pie con la dirección del reporte y un enlace interactivo de altura accesible (45px) a Google Maps para geolocalización física real.
+        *   **Limpieza de Deuda Técnica:** Se eliminó por completo el componente antiguo `IncidentsTable.tsx` una vez integrado y verificado el feed en `Dashboard.tsx` mediante `pnpm build`.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
 2.  **Validación de Estados de Foco y Contraste:** Asegurar que los componentes interactivos utilicen indicadores de enfoque altamente visibles que cumplan con la relación de contraste **3:1** (WCAG 1.4.11) sobre fondo blanco.
+

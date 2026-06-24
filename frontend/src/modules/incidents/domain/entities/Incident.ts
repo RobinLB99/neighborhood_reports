@@ -8,4 +8,5 @@ export interface Incident {
   estado: string;
   descripcion: string;
   fechaCreacion?: string;
+  fechaActualizacion?: string;
 }

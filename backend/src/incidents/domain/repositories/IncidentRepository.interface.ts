@@ -14,4 +14,12 @@ export interface IncidentRepository {
    * @returns Entidad de dominio Reporte con su ID asignado tras la persistencia.
    */
   createReport(report: Reporte): Promise<Reporte>;
+
+  /**
+   * Obtiene la lista de reportes activos ('pendiente' y 'en_gestion') de un barrio.
+   * 
+   * @param barrioId ID del barrio de donde se desean consultar los reportes.
+   * @returns Listado de entidades de dominio Reporte.
+   */
+  listActiveReportsByBarrio(barrioId: number): Promise<Reporte[]>;
 }

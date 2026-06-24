@@ -527,5 +527,48 @@ registry.registerPath({
   },
 });
 
+const IncidentSchema = z.object({
+  id: z.number(),
+  usuarioId: z.number(),
+  barrioId: z.number(),
+  direccion: z.string(),
+  ubicacion: z.string(),
+  fotoUrl: z.string(),
+  estado: z.string(),
+  descripcion: z.string(),
+  fechaCreacion: z.string().optional(),
+  fechaActualizacion: z.string().optional(),
+});
+
+const ListActiveReportsResponseSchema = registry.register("ListActiveReportsResponse", z.object({
+  message: z.string(),
+  data: z.array(IncidentSchema),
+}));
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/list",
+  summary: "Listar reportes activos del barrio",
+  description: "Recupera los reportes barriales activos ('pendiente' o 'en_gestion') para el barrio del usuario autenticado (cualquier rol).",
+  security: [{ bearerAuth: [] }],
+  responses: {
+    200: {
+      description: "Listado de reportes activos recuperado con éxito.",
+      content: {
+        "application/json": {
+          schema: ListActiveReportsResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+
 
 

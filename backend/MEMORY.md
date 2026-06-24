@@ -102,6 +102,13 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Seguridad total en la consulta basada en el JWT (evita que un líder consulte vecinos de otro barrio alterando parámetros). Cumple con el principio de menor privilegio.
     *   **Negativas:** El usuario solicitante debe tener obligatoriamente un `barrioId` asignado y válido en su JWT, de lo contrario se rechaza con HTTP 400.
 
+### 5. Consulta y Listado de Reportes Barriales Activos (GET /api/incidents/list)
+*   **Contexto:** Se requiere permitir a los usuarios autenticados (de cualquier rol) obtener un listado de reportes barriales activos (con estado `pendiente` o `en_gestion`) para su propio barrio.
+*   **Decisión:** El endpoint se restringe a métodos `GET`. Al igual que con vecinos, se extrae el `barrioId` de forma segura de las cabeceras inyectadas por el JWT en el middleware (`x-user-barrio-id`) mediante `getAuthenticatedUser(request)`. Se excluyen explícitamente los reportes solucionados o borrados lógicamente (`activo = false`).
+*   **Consecuencias:**
+    *   **Positivas:** Seguridad absoluta por diseño contra IDOR (ningún usuario puede listar reportes de otros barrios). Alta velocidad al procesar filtros en base de datos. Consistencia con la arquitectura hexagonal.
+    *   **Negativas:** Obliga a que el usuario posea un `barrioId` asociado en su JWT.
+
 ---
 
 ## 🐳 Decisiones de Infraestructura y Contenedores
@@ -149,5 +156,5 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 - [x] Diseñar e implementar el flujo público y atómico de alta para líderes y comités barriales (ADR 0004).
 - [x] Refactorizar la base de datos y esquema de incidentes para utilizar restricciones SQL `CHECK` en el campo `estado` (VARCHAR).
 - [x] Diseñar e implementar el flujo de subidas firmadas a Cloudinary e insertar reportes ciudadanos (`POST /api/incidents/create`).
-- [ ] Implementar la consulta y listado de reportes barriales activos (`GET /api/incidents/list`).
+- [x] Implementar la consulta y listado de reportes barriales activos (`GET /api/incidents/list`).
 - [ ] Continuar estructurando las capas concéntricas de los dominios (`worker-profile`, `identity-validation`, etc.).

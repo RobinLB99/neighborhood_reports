@@ -802,6 +802,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/incidents/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Listar reportes activos del barrio
+         * @description Recupera los reportes barriales activos ('pendiente' o 'en_gestion') para el barrio del usuario autenticado (cualquier rol).
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Listado de reportes activos recuperado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListActiveReportsResponse"];
+                    };
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -920,6 +973,21 @@ export interface components {
                 descripcion: string;
                 fechaCreacion?: string;
             };
+        };
+        ListActiveReportsResponse: {
+            message: string;
+            data: {
+                id: number;
+                usuarioId: number;
+                barrioId: number;
+                direccion: string;
+                ubicacion: string;
+                fotoUrl: string;
+                estado: string;
+                descripcion: string;
+                fechaCreacion?: string;
+                fechaActualizacion?: string;
+            }[];
         };
     };
     responses: never;

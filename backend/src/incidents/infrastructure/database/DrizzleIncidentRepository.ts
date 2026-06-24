@@ -1,3 +1,4 @@
+import { eq, and, inArray, desc } from "drizzle-orm";
 import { db } from "../../../shared-kernel/database/drizzle.js";
 import { Reporte, type ReportStatus } from "../../domain/entities/Reporte.js";
 import type { IncidentRepository } from "../../domain/repositories/IncidentRepository.interface.js";
@@ -52,6 +53,49 @@ export class DrizzleIncidentRepository implements IncidentRepository {
     } catch (error: any) {
       console.error("[Database Error] Error al persistir reporte:", error);
       throw new Error(`[Database Infrastructure Error]: ${error.message || "Fallo de persistencia desconocido."}`);
+    }
+  }
+
+  /**
+   * Obtiene la lista de reportes activos ('pendiente' y 'en_gestion') de un barrio utilizando Drizzle ORM.
+   * 
+   * @param barrioId ID del barrio de donde se desean consultar los reportes.
+   * @returns Listado de entidades de dominio Reporte.
+   * @throws Error si ocurre un fallo al consultar en la persistencia.
+   */
+  async listActiveReportsByBarrio(barrioId: number): Promise<Reporte[]> {
+    try {
+      const records = await db
+        .select()
+        .from(reportes)
+        .where(
+          and(
+            eq(reportes.barrioId, barrioId),
+            inArray(reportes.estado, ["pendiente", "en_gestion"]),
+            eq(reportes.activo, true)
+          )
+        )
+        .orderBy(desc(reportes.fechaCreacion));
+
+      return records.map(
+        (row) =>
+          new Reporte(
+            row.id,
+            row.usuarioId,
+            row.barrioId,
+            row.direccion,
+            row.ubicacion,
+            row.fotoUrl,
+            row.estado as ReportStatus,
+            row.descripcion,
+            row.activo ?? undefined,
+            row.fechaCreacion ?? undefined,
+            row.fechaActualizacion ?? undefined
+          )
+      );
+    } catch (error: any) {
+      console.error("[Database Error] Error al listar reportes activos:", error);
+      throw new Error(`[Database Infrastructure Error]: ${error.message || "Fallo de consulta desconocido."}`);
     }
   }
 }

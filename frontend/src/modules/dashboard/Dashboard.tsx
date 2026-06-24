@@ -1,4 +1,5 @@
 import useAuth from '@modules/auth/application/useAuth';
+import IncidentsFeed from '@modules/incidents/ui/IncidentsFeed';
 
 interface Props {
   apiUrl: string;
@@ -6,7 +7,7 @@ interface Props {
 
 export default function Dashboard({ apiUrl }: Props) {
   const { user, loading, logout } = useAuth({ apiUrl, requireAuth: true });
-
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') || '' : '';
 
   if (loading) {
     return (
@@ -80,6 +81,10 @@ export default function Dashboard({ apiUrl }: Props) {
               Ver Directiva
             </a>
           </div>
+        )}
+
+        {user.barrioId && (
+          <IncidentsFeed apiUrl={apiUrl} token={token} />
         )}
       </main>
 
