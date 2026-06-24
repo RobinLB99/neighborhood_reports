@@ -2,10 +2,12 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { handleCors } from "../../src/shared-kernel/http/cors.js";
 import { RegisterUserSchema } from "../../src/authentication/application/dtos/RegisterUserDto.js";
 import { DrizzleAuthRepository } from "../../src/authentication/infrastructure/database/DrizzleAuthRepository.js";
+import { DrizzleCommitteeExistsGateway } from "../../src/authentication/infrastructure/database/DrizzleCommitteeExistsGateway.js";
 import { RegisterUserUseCase } from "../../src/authentication/application/use-cases/RegisterUserUseCase.js";
 import {
   UsernameAlreadyTakenError,
   BarrioNotFoundError,
+  CommitteeNotFoundError,
 } from "../../src/shared-kernel/errors/DomainErrors.js";
 
 /**
@@ -54,7 +56,8 @@ export default async function handler(
 
     // 3. Inyección manual de dependencias
     const repository = new DrizzleAuthRepository();
-    const useCase = new RegisterUserUseCase(repository);
+    const committeeGateway = new DrizzleCommitteeExistsGateway();
+    const useCase = new RegisterUserUseCase(repository, committeeGateway);
 
     // 4. Ejecución del flujo de negocio
     const output = await useCase.execute(result.data);
@@ -80,6 +83,15 @@ export default async function handler(
       console.warn(`[Auth Warning] Barrio no encontrado: ${error.message}`);
       return response.status(404).json({
         error: "Not Found",
+        message: error.message,
+        code: error.code,
+      });
+    }
+
+    if (error instanceof CommitteeNotFoundError) {
+      console.warn(`[Auth Warning] Comité no encontrado para el barrio del registro: ${error.message}`);
+      return response.status(403).json({
+        error: "Forbidden",
         message: error.message,
         code: error.code,
       });

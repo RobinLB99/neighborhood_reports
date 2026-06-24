@@ -453,6 +453,229 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/committee/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Registrar miembro del comité
+         * @description Permite a un líder de comité barrial registrar nuevos miembros directivos (Secretario, Vocal).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        usuarioId: number;
+                        /** @enum {string} */
+                        rolComite: "Secretario" | "Vocal";
+                    };
+                };
+            };
+            responses: {
+                /** @description Miembro del comité registrado exitosamente. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RegisterCommitteeMemberResponse"];
+                    };
+                };
+                /** @description El payload enviado no cumple con las validaciones requeridas. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo los líderes pueden realizar esta operación. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Comité no encontrado para el barrio del líder. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflicto: El nombre de usuario ya está en uso. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor o configuración de seguridad. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/neighbors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener vecinos elegibles del barrio
+         * @description Recupera la lista de vecinos (ciudadanos regulares) del mismo barrio que el líder o miembro solicitante para poder ser asignados al comité.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Vecinos del barrio recuperados exitosamente. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NeighborsResponse"];
+                    };
+                };
+                /** @description El usuario solicitante no pertenece a ningún barrio. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros pueden acceder. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/committee/members/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener miembros del comité
+         * @description Recupera la lista completa de los miembros directivos (Presidente, Secretario, Vocal) del comité del barrio del usuario autenticado.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Miembros del comité recuperados con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CommitteeMembersListResponse"];
+                    };
+                };
+                /** @description El usuario solicitante no pertenece a ningún barrio. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros pueden acceder. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Comité no encontrado para el barrio del usuario. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -480,6 +703,24 @@ export interface components {
                 usuarioId: number;
                 miembroId: number;
             };
+        };
+        RegisterCommitteeMemberResponse: {
+            message: string;
+            data: {
+                miembroId: number;
+            };
+        };
+        CommitteeMembersListResponse: {
+            message: string;
+            data: {
+                id: number;
+                usuarioId: number;
+                nombre: string;
+                usuario: string;
+                /** @enum {string} */
+                rol: "Presidente" | "Secretario" | "Vocal";
+                fechaRegistro?: string | null;
+            }[];
         };
         RegisterUserResponse: {
             message: string;
@@ -519,6 +760,15 @@ export interface components {
                 nombre: string;
                 /** Format: date-time */
                 fechaCreacion?: string;
+            }[];
+        };
+        NeighborsResponse: {
+            message: string;
+            data: {
+                id: number;
+                nombre: string;
+                usuario: string;
+                fechaRegistro?: string;
             }[];
         };
     };

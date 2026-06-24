@@ -64,6 +64,23 @@ export default function Dashboard({ apiUrl }: Props) {
             </p>
           </div>
         </div>
+
+        {(user.rol === 'lider' || user.rol === 'miembro') && (
+          <div class="mt-8 bg-chalk border border-hairline rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-base font-semibold text-graphite">Gestión de la Directiva</h3>
+              <p class="text-sm text-concrete">
+                Consulta los miembros del comité y asigna cargos como Secretario o Vocal.
+              </p>
+            </div>
+            <a
+              href="/dashboard/miembros"
+              class="bg-graphite text-chalk text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-carbon transition-colors inline-block whitespace-nowrap cursor-pointer text-center"
+            >
+              Ver Directiva
+            </a>
+          </div>
+        )}
       </main>
     </div>
   );

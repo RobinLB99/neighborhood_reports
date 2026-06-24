@@ -43,6 +43,13 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Registro en un solo paso libre de tokens JWT para los líderes. Transaccionalidad al 100% (consistencia dura). Coherencia en la API al ubicar todos los registros públicos bajo el prefijo `/api/auth/*`.
     *   **Negativas:** Introduce una dependencia directa del dominio `src/committee` hacia las entidades de usuario (`User`) y el helper de hash del kernel.
 
+### 3. Restricción de Registro de Ciudadanos sin Comité Barrial Activo
+*   **Contexto:** Un ciudadano normal no debe poder registrarse en un barrio si no existe previamente al menos un miembro del comité registrado allí (presidente, etc.). Esto evita la proliferación de ciudadanos en barrios "fantasmas" o sin representación oficial.
+*   **Decisión:** Implementar la validación en el caso de uso `RegisterUserUseCase` a través del puerto `CommitteeExistsGateway` (Alternativa 1 de desacoplamiento). La infraestructura implementa este puerto a través de `DrizzleCommitteeExistsGateway`, consultando si hay algún registro en la tabla `comites` para el `barrioId` indicado.
+*   **Consecuencias:**
+    *   **Positivas:** Desacoplamiento total entre el dominio de autenticación (`authentication`) y el de comités (`committee`). El endpoint devuelve un código HTTP `403 Forbidden` con error estructurado si la validación falla.
+    *   **Negativas:** Ninguna.
+
 ---
 
 ## 🛡️ Decisiones de Seguridad
@@ -78,6 +85,13 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Contrato OpenAPI autogenerado y siempre fiel a las reglas de validación en tiempo de ejecución. El frontend puede tiparse de forma 100% independiente.
     *   **Negativas:** Añade una dependencia de desarrollo adicional (`@asteasolutions/zod-to-openapi`) y requiere registrar de forma explícita cada ruta y DTO nuevo en el `registry`.
 
+### 3. Consulta Segura de Vecinos del Barrio (GET /api/users/neighbors)
+*   **Contexto:** Los líderes del comité necesitan un listado de vecinos elegibles de su propio barrio para promoverlos a cargos directivos. El frontend no debe enviar el `barrioId` de manera explícita para evitar vulnerabilidades de escalación o fuga de datos (IDOR).
+*   **Decisión:** Crear un endpoint protegido por el middleware JWT que extraiga dinámicamente el `barrioId` del contexto decodificado (`x-user-barrio-id`) y delegue en el caso de uso `GetNeighborsUseCase`. El acceso está restringido exclusivamente a roles `lider` y `miembro`.
+*   **Consecuencias:**
+    *   **Positivas:** Seguridad total en la consulta basada en el JWT (evita que un líder consulte vecinos de otro barrio alterando parámetros). Cumple con el principio de menor privilegio.
+    *   **Negativas:** El usuario solicitante debe tener obligatoriamente un `barrioId` asignado y válido en su JWT, de lo contrario se rechaza con HTTP 400.
+
 ---
 
 ## 🐳 Decisiones de Infraestructura y Contenedores
@@ -92,8 +106,21 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Paridad de entornos de ejecución de dependencias, compilación aislada con pnpm corepack, y declaración explícita de registros de imágenes (`docker.io`) para evitar ambigüedades.
     *   **Negativas:** Mayor tiempo de compilación inicial de la imagen en la máquina de desarrollo (mitigado con la caché de capas de Docker).
 
----
+### 2. Consulta de Miembros de la Junta Directiva de un Comité (GET /api/committee/members/list)
+*   **Contexto:** Los líderes y miembros de un comité necesitan listar de forma exclusiva a los miembros directivos de su junta (Presidente, Secretario, Vocal). Para mantener la eficiencia de las funciones serverless de Vercel y evitar bundles pesados, se rechazó la unificación en el archivo del POST (`api/committee/members.ts`).
+*   **Decisión:** Crear un handler completamente aislado e independiente en `/api/committee/members/list.ts`. El acceso está estrictamente protegido y limitado a roles `lider` y `miembro`. La consulta relacional en la base de datos se realiza a través de un `innerJoin` entre `miembros_comite`, `comites` y `usuarios` en el repositorio concreto.
+*   **Consecuencias:**
+    *   **Positivas:** Separación clara de comandos (escribir) y consultas (leer) (principios tipo CQRS a nivel de archivo). Menor tamaño de empaquetado para funciones individuales.
+    *   **Negativas:** Incremento en el número de archivos físicos de enrutamiento en la capa de entrada.
 
+### 3. Inicialización e Importación Prioritaria de Extensiones de Zod OpenAPI (Módulo `extend-zod.ts`)
+*   **Contexto:** Al intentar compilar los esquemas con nombre de respuestas DTOs en `registry.ts`, se presentaba el error `TypeError: zodSchema.openapi is not a function`. Esto ocurría porque los DTOs importados síncronamente al inicio de `registry.ts` evaluaban esquemas Zod antes de que se ejecutara la función `extendZodWithOpenApi(z)`.
+*   **Decisión:** Crear un archivo de inicialización aislado `src/shared-kernel/openapi/extend-zod.ts` que extienda Zod inmediatamente. Luego, importar este archivo como la primerísima línea en `registry.ts` para garantizar la ejecución de la extensión antes de la evaluación de cualquier DTO importado posteriormente.
+*   **Consecuencias:**
+    *   **Positivas:** Solución robusta al orden de ejecución en ES Modules que permite usar libremente la API fluida `.openapi()` de Zod en DTOs autodeclarados.
+    *   **Negativas:** Ninguna.
+
+---
 
 ## 📋 Tareas Pendientes e Hitos Inmediatos
 - [x] Crear el archivo `.env` local real y configurar `JWT_SECRET` y la API Key de Neon.

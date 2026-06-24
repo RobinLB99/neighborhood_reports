@@ -38,4 +38,23 @@ export class CommitteeMember {
     }
     return new CommitteeMember(undefined, undefined, undefined, rol, undefined);
   }
+
+  /**
+   * Factory de creación general para otros miembros de la directiva.
+   * 
+   * @param comiteId Relación con el comité al que se asocia.
+   * @param rol Cargo directivo asignado.
+   * @throws Error si el rol no es válido.
+   */
+  static create(comiteId: number, rol: CommitteeRole): CommitteeMember {
+    if (!comiteId || comiteId <= 0) {
+      throw new Error("El ID de comite debe ser un número entero positivo válido.");
+    }
+    const rolesValidos: CommitteeRole[] = ["Presidente", "Secretario", "Vocal"];
+    if (!rolesValidos.includes(rol)) {
+      throw new Error(`El rol '${rol}' no es válido para la directiva de un comité.`);
+    }
+    return new CommitteeMember(undefined, comiteId, undefined, rol, undefined);
+  }
 }
+

@@ -1,7 +1,9 @@
 import { User } from "../../domain/entities/User.js";
 import type { AuthRepository } from "../../domain/repositories/AuthRepository.interface.js";
+import type { CommitteeExistsGateway } from "../../domain/repositories/CommitteeExistsGateway.interface.js";
 import type { RegisterUserDto } from "../dtos/RegisterUserDto.js";
 import { hashPassword } from "../../../shared-kernel/utils/hash.js";
+import { CommitteeNotFoundError } from "../../../shared-kernel/errors/DomainErrors.js";
 
 export interface RegisterUserResult {
   readonly id: number;
@@ -19,7 +21,10 @@ export interface RegisterUserResult {
  * Cifra la contraseña y delega el guardado en el repositorio de autenticación.
  */
 export class RegisterUserUseCase {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(
+    private readonly authRepository: AuthRepository,
+    private readonly committeeExistsGateway: CommitteeExistsGateway
+  ) {}
 
   /**
    * Ejecuta el proceso de registro del usuario.
@@ -28,6 +33,12 @@ export class RegisterUserUseCase {
    * @returns Datos públicos del usuario registrado.
    */
   async execute(dto: RegisterUserDto): Promise<RegisterUserResult> {
+    // Validar que exista el comité barrial antes del registro
+    const committeeExists = await this.committeeExistsGateway.existsInBarrio(dto.barrioId);
+    if (!committeeExists) {
+      throw new CommitteeNotFoundError(dto.barrioId);
+    }
+
     // 1. Ciframos la contraseña usando utilidad nativa
     const contrasenaHash = hashPassword(dto.contrasena);
 

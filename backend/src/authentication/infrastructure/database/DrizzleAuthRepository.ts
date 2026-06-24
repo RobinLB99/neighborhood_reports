@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../../../shared-kernel/database/drizzle.js";
 import { User } from "../../domain/entities/User.js";
 import type { AuthRepository } from "../../domain/repositories/AuthRepository.interface.js";
@@ -166,6 +166,44 @@ export class DrizzleAuthRepository implements AuthRepository {
       .update(usuarios)
       .set({ rolId: dbRole.id })
       .where(eq(usuarios.id, userId));
+  }
+
+  /**
+   * Busca vecinos de un barrio que sean elegibles para formar parte del comité.
+   * Filtra por barrio y asegura que el rol sea "ciudadano".
+   */
+  async findEligibleNeighborsByBarrio(barrioId: number): Promise<User[]> {
+    const rows = await db
+      .select({
+        id: usuarios.id,
+        barrioId: usuarios.barrioId,
+        nombre: usuarios.nombre,
+        usuario: usuarios.usuario,
+        contrasenaHash: usuarios.contrasenaHash,
+        fechaRegistro: usuarios.fechaRegistro,
+        rolNombre: roles.nombre,
+      })
+      .from(usuarios)
+      .leftJoin(roles, eq(usuarios.rolId, roles.id))
+      .where(
+        and(
+          eq(usuarios.barrioId, barrioId),
+          eq(roles.nombre, "ciudadano")
+        )
+      );
+
+    return rows.map(
+      (row) =>
+        new User(
+          row.id,
+          row.barrioId,
+          row.nombre,
+          row.usuario,
+          row.contrasenaHash,
+          row.rolNombre ?? "ciudadano",
+          row.fechaRegistro ?? undefined
+        )
+    );
   }
 }
 

@@ -1,13 +1,14 @@
-import { extendZodWithOpenApi, OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
+import "./extend-zod.js";
+import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 import { LoginSchema } from "../../authentication/application/dtos/LoginDto.js";
 import { RegisterUserSchema } from "../../authentication/application/dtos/RegisterUserDto.js";
 import { RegisterCommitteeSchema } from "../../committee/application/dtos/RegisterCommitteeDto.js";
+import { RegisterCommitteeMemberSchema } from "../../committee/application/dtos/RegisterCommitteeMemberDto.js";
 import { GetCitiesSchema } from "../../territory/application/dtos/GetCitiesDto.js";
 import { GetNeighborhoodsSchema } from "../../territory/application/dtos/GetNeighborhoodsDto.js";
-
-// Extend Zod to support the .openapi() extension method
-extendZodWithOpenApi(z);
+import { NeighborsResponseSchema } from "../../authentication/application/dtos/GetNeighborsDto.js";
+import { CommitteeMembersListResponseSchema } from "../../committee/application/dtos/GetCommitteeMembersDto.js";
 
 export const registry = new OpenAPIRegistry();
 
@@ -38,6 +39,19 @@ const RegisterCommitteeResponseSchema = registry.register("RegisterCommitteeResp
     miembroId: z.number(),
   }),
 }));
+
+const RegisterCommitteeMemberResponseSchema = registry.register("RegisterCommitteeMemberResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    miembroId: z.number(),
+  }),
+}));
+
+const CommitteeMembersListResponseSchemaRegistered = registry.register(
+  "CommitteeMembersListResponse",
+  CommitteeMembersListResponseSchema
+);
+
 
 const RegisterUserResponseSchema = registry.register("RegisterUserResponse", z.object({
   message: z.string(),
@@ -309,3 +323,113 @@ registry.registerPath({
     },
   },
 });
+
+registry.registerPath({
+  method: "post",
+  path: "/api/committee/members",
+  summary: "Registrar miembro del comité",
+  description: "Permite a un líder de comité barrial registrar nuevos miembros directivos (Secretario, Vocal).",
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: RegisterCommitteeMemberSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Miembro del comité registrado exitosamente.",
+      content: {
+        "application/json": {
+          schema: RegisterCommitteeMemberResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "El payload enviado no cumple con las validaciones requeridas.",
+    },
+    403: {
+      description: "Acceso denegado. Solo los líderes pueden realizar esta operación.",
+    },
+    404: {
+      description: "Comité no encontrado para el barrio del líder.",
+    },
+    409: {
+      description: "Conflicto: El nombre de usuario ya está en uso.",
+    },
+    500: {
+      description: "Error interno del servidor o configuración de seguridad.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/users/neighbors",
+  summary: "Obtener vecinos elegibles del barrio",
+  description: "Recupera la lista de vecinos (ciudadanos regulares) del mismo barrio que el líder o miembro solicitante para poder ser asignados al comité.",
+  security: [{ bearerAuth: [] }],
+  responses: {
+    200: {
+      description: "Vecinos del barrio recuperados exitosamente.",
+      content: {
+        "application/json": {
+          schema: registry.register("NeighborsResponse", z.object({
+            message: z.string(),
+            data: NeighborsResponseSchema,
+          })),
+        },
+      },
+    },
+    400: {
+      description: "El usuario solicitante no pertenece a ningún barrio.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros pueden acceder.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/committee/members/list",
+  summary: "Obtener miembros del comité",
+  description: "Recupera la lista completa de los miembros directivos (Presidente, Secretario, Vocal) del comité del barrio del usuario autenticado.",
+  security: [{ bearerAuth: [] }],
+  responses: {
+    200: {
+      description: "Miembros del comité recuperados con éxito.",
+      content: {
+        "application/json": {
+          schema: CommitteeMembersListResponseSchemaRegistered,
+        },
+      },
+    },
+    400: {
+      description: "El usuario solicitante no pertenece a ningún barrio.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros pueden acceder.",
+    },
+    404: {
+      description: "Comité no encontrado para el barrio del usuario.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+

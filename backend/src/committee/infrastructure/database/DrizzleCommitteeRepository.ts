@@ -10,6 +10,7 @@ import {
   CommitteeAlreadyExistsError,
   BarrioNotFoundError,
   UsernameAlreadyTakenError,
+  UserAlreadyInCommitteeError,
 } from "../../../shared-kernel/errors/DomainErrors.js";
 
 export class DrizzleCommitteeRepository implements CommitteeRepository {
@@ -115,4 +116,117 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
       throw error;
     }
   }
+
+  async getByBarrioId(barrioId: number): Promise<Committee | null> {
+    const [row] = await db
+      .select()
+      .from(comites)
+      .where(eq(comites.barrioId, barrioId))
+      .limit(1);
+
+    if (!row) {
+      return null;
+    }
+
+    return new Committee(row.id, row.barrioId, row.fechaCreacion ?? undefined);
+  }
+
+  async registerMember(
+    userId: number,
+    member: CommitteeMember
+  ): Promise<{
+    miembroId: number;
+  }> {
+    try {
+      return await db.transaction(async (tx) => {
+        // 0. Obtener el ID del rol 'miembro'
+        const [dbRole] = await tx
+          .select({ id: roles.id })
+          .from(roles)
+          .where(eq(roles.nombre, "miembro"))
+          .limit(1);
+
+        if (!dbRole) {
+          throw new Error("El rol 'miembro' no se encuentra configurado en el sistema.");
+        }
+
+        // 1. Actualizar el rol del usuario a 'miembro'
+        const [updatedUser] = await tx
+          .update(usuarios)
+          .set({ rolId: dbRole.id })
+          .where(eq(usuarios.id, userId))
+          .returning({ id: usuarios.id });
+
+        if (!updatedUser) {
+          throw new Error("No se pudo actualizar el rol del usuario.");
+        }
+
+        // 2. Asignamos al usuario como miembro en miembrosComite.
+        const [insertedMember] = await tx
+          .insert(miembrosComite)
+          .values({
+            comiteId: member.comiteId!,
+            usuarioId: userId,
+            rol: member.rol,
+          })
+          .returning({ id: miembrosComite.id });
+
+        if (!insertedMember) {
+          throw new Error("No se pudo asignar el usuario como miembro del comité.");
+        }
+
+        return {
+          miembroId: insertedMember.id,
+        };
+      });
+    } catch (error: any) {
+      // Manejo de errores específicos de PostgreSQL
+      if (error && typeof error === "object") {
+        const code = error.code || (error.rawError && error.rawError.code);
+        const detail = error.detail || "";
+        const message = error.message || "";
+
+        // Código de error Postgres 23505: Violación de índice único
+        if (code === "23505") {
+          if (message.includes("miembros_comite_usuario_id_unique") || detail.includes("usuario_id") || message.includes("usuario_id")) {
+            throw new UserAlreadyInCommitteeError(userId);
+          }
+        }
+      }
+
+      // Si es otro error de base de datos o de runtime, se relanza
+      throw error;
+    }
+  }
+
+  async getMembersByBarrioId(
+    barrioId: number
+  ): Promise<
+    Array<{
+      id: number;
+      usuarioId: number;
+      nombre: string;
+      usuario: string;
+      rol: string;
+      fechaRegistro: Date | null;
+    }>
+  > {
+    const rows = await db
+      .select({
+        id: miembrosComite.id,
+        usuarioId: miembrosComite.usuarioId,
+        nombre: usuarios.nombre,
+        usuario: usuarios.usuario,
+        rol: miembrosComite.rol,
+        fechaRegistro: miembrosComite.fechaRegistro,
+      })
+      .from(miembrosComite)
+      .innerJoin(comites, eq(miembrosComite.comiteId, comites.id))
+      .innerJoin(usuarios, eq(miembrosComite.usuarioId, usuarios.id))
+      .where(eq(comites.barrioId, barrioId));
+
+    return rows;
+  }
 }
+
+

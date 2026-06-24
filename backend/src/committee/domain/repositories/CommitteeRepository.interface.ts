@@ -16,4 +16,38 @@ export interface CommitteeRepository {
     usuarioId: number;
     miembroId: number;
   }>;
+
+  /**
+   * Obtiene un comité barrial por el identificador del barrio.
+   */
+  getByBarrioId(barrioId: number): Promise<Committee | null>;
+
+  /**
+   * Promueve un usuario existente al rol de sistema 'miembro' y lo registra en miembros_comite.
+   */
+  registerMember(
+    userId: number,
+    member: CommitteeMember
+  ): Promise<{
+    miembroId: number;
+  }>;
+
+  /**
+   * Obtiene todos los miembros asociados al comité de un barrio con sus datos de usuario.
+   */
+  getMembersByBarrioId(
+    barrioId: number
+  ): Promise<
+    Array<{
+      id: number;
+      usuarioId: number;
+      nombre: string;
+      usuario: string;
+      rol: string;
+      fechaRegistro: Date | null;
+    }>
+  >;
 }
+
+
+

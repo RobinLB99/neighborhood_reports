@@ -100,11 +100,11 @@ export default function RegisterCitizenForm({ apiUrl }: Props) {
         if (res.status === 409) {
           setError(json.message ?? 'El nombre de usuario ya está en uso.');
         } else if (res.status === 404) {
-          setError('El barrio seleccionado no existe.');
+          setError(json.message ?? 'El barrio seleccionado no existe.');
         } else if (res.status === 400) {
-          setError('Por favor verifica los datos ingresados.');
+          setError(json.message ?? 'Por favor verifica los datos ingresados.');
         } else {
-          setError('Ha ocurrido un error inesperado. Intenta de nuevo.');
+          setError(json.message ?? 'Ha ocurrido un error inesperado. Intenta de nuevo.');
         }
         return;
       }

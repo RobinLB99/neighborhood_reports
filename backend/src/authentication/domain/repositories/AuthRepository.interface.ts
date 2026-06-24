@@ -22,4 +22,10 @@ export interface AuthRepository {
    * Actualiza el rol de un usuario en el sistema.
    */
   updateUserRole(userId: number, roleName: string): Promise<void>;
+
+  /**
+   * Busca vecinos de un barrio que sean elegibles para formar parte del comité.
+   * (Normalmente usuarios con el rol de ciudadano).
+   */
+  findEligibleNeighborsByBarrio(barrioId: number): Promise<User[]>;
 }

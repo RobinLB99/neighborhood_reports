@@ -23,7 +23,12 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   Se reemplazó la vista de bienvenida de Astro en `index.astro` por una redirección limpia a `/dashboard`.
         *   Se implementó el custom hook centralizado `useAuth` (`src/modules/auth/application/useAuth.ts`) que gestiona el estado de sesión (`localStorage`, validación de token y logout) y actúa como guardián de rutas redirigiendo a `/login` en caso de sesión inválida.
         *   Se refactorizó el componente `Dashboard` para consumir la sesión mediante este hook (`useAuth({ requireAuth: true })`).
-
+3.  **Gestión de Miembros del Comité [2026-06-24]:**
+    *   *Impacto técnico:*
+        *   **Sincronización de Contratos API:** Se sincronizó `openapi.json` desde el backend y se regeneró `src/shared/types/api.ts` con los nuevos tipos de endpoints `/api/committee/members`, `/api/committee/members/list` y `/api/users/neighbors`.
+        *   **Arquitectura Hexagonal (Dominio y Aplicación):** Se estructuró el módulo `committee` con entidades de dominio (`CommitteeMember`, `Neighbor`), puerto del repositorio (`CommitteeRepository`), casos de uso dedicados (`GetCommitteeMembersUseCase`, `GetEligibleNeighborsUseCase`, `RegisterCommitteeMemberUseCase`) e implementación de infraestructura (`HttpCommitteeRepository`).
+        *   **Capa UI e Integración:** Se implementaron islas reactivas con Preact (`CommitteeManager`, `CommitteeMembersList`, `RegisterMemberForm`) respetando el sistema de diseño brutalista monocromático y las pautas táctiles de accesibilidad (objetivos de toque > 44px).
+        *   **Ruta de Entrega (Delivery):** Se integró la nueva ruta `/dashboard/miembros` mediante la página Astro `src/pages/dashboard/miembros.astro` y se enlazó desde el panel principal en el `Dashboard`.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
