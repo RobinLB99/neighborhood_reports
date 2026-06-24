@@ -71,6 +71,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Registrar usuario
+         * @description Permite registrar un nuevo usuario en la plataforma con el rol de ciudadano.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        nombre: string;
+                        usuario: string;
+                        contrasena: string;
+                        barrioId: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Usuario registrado exitosamente. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RegisterUserResponse"];
+                    };
+                };
+                /** @description El payload enviado no cumple con las validaciones requeridas. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Barrio no encontrado. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Conflicto: El nombre de usuario ya está en uso. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -131,7 +207,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/committee/register-first": {
+    "/api/auth/register-leader": {
         parameters: {
             query?: never;
             header?: never;
@@ -141,8 +217,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Fundar un comité barrial
-         * @description Permite fundar un comité barrial y registrar al primer miembro administrador (Presidente).
+         * Registrar líder y fundar comité
+         * @description Permite fundar un comité barrial y dar de alta a su líder de forma pública en un solo paso.
          */
         post: {
             parameters: {
@@ -162,13 +238,13 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Comité barrial registrado exitosamente. */
+                /** @description Comité barrial y líder registrados exitosamente. */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["RegisterFirstMemberResponse"];
+                        "application/json": components["schemas"]["RegisterCommitteeResponse"];
                     };
                 };
                 /** @description El payload enviado no cumple con las validaciones requeridas. */
@@ -185,7 +261,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Conflicto por duplicidad (el comité o el usuario ya existen). */
+                /** @description Conflicto por duplicidad de usuario o de comité en el barrio. */
                 409: {
                     headers: {
                         [name: string]: unknown;
@@ -201,6 +277,176 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/territory/province": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener todas las provincias
+         * @description Recupera la lista completa de provincias registradas en el sistema para su uso en formularios de registro.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Catálogo de provincias recuperado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProvincesResponse"];
+                    };
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/territory/city": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener ciudades por provincia
+         * @description Recupera las ciudades asociadas a una provincia específica mediante su ID.
+         */
+        get: {
+            parameters: {
+                query: {
+                    provinceId: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Ciudades recuperadas con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CitiesResponse"];
+                    };
+                };
+                /** @description El ID de la provincia proporcionado es inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Provincia no encontrada. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/territory/neighborhood": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener barrios por ciudad
+         * @description Recupera los barrios asociados a una ciudad específica mediante su ID.
+         */
+        get: {
+            parameters: {
+                query: {
+                    cityId: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Barrios recuperados con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NeighborhoodsResponse"];
+                    };
+                };
+                /** @description El ID de la ciudad proporcionado es inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Ciudad no encontrada. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -227,13 +473,53 @@ export interface components {
                 barrioId: number | null;
             };
         };
-        RegisterFirstMemberResponse: {
+        RegisterCommitteeResponse: {
             message: string;
             data: {
                 comiteId: number;
                 usuarioId: number;
                 miembroId: number;
             };
+        };
+        RegisterUserResponse: {
+            message: string;
+            data: {
+                id: number;
+                nombre: string;
+                usuario: string;
+                rol: string;
+                barrioId: number;
+                fechaRegistro?: string;
+            };
+        };
+        ProvincesResponse: {
+            message: string;
+            data: {
+                id: number;
+                nombre: string;
+                /** Format: date-time */
+                fechaCreacion?: string;
+            }[];
+        };
+        CitiesResponse: {
+            message: string;
+            data: {
+                id: number;
+                provinciaId: number;
+                nombre: string;
+                /** Format: date-time */
+                fechaCreacion?: string;
+            }[];
+        };
+        NeighborhoodsResponse: {
+            message: string;
+            data: {
+                id: number;
+                ciudadId: number;
+                nombre: string;
+                /** Format: date-time */
+                fechaCreacion?: string;
+            }[];
         };
     };
     responses: never;

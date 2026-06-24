@@ -1,11 +1,11 @@
 ---
 import Layout from '@shared/layouts/Layout.astro';
-import RegisterCitizenForm from '@modules/auth/ui/RegisterCitizenForm';
+import RegisterCommitteeForm from '@modules/committee/ui/RegisterCommitteeForm';
 
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 ---
 
-<Layout title="Registro de Vecino — Reportes Barriales">
+<Layout title="Fundar Comité — Reportes Barriales">
   <main class="min-h-screen bg-chalk flex items-center justify-center p-4 py-12">
     <div class="w-full max-w-sm">
 
@@ -14,15 +14,15 @@ const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
           Infraestructura Urbana · Guayaquil
         </p>
         <h1 class="text-2xl font-semibold text-graphite">
-          Regístrate como vecino
+          Fundar un comité barrial
         </h1>
         <p class="text-sm text-concrete mt-1">
-          Crea tu cuenta de ciudadano para reportar y apoyar incidencias en tu barrio.
+          Regístrate como presidente fundador de tu comité de barrio.
         </p>
       </div>
 
       <div class="bg-chalk border border-hairline rounded-xl p-6">
-        <RegisterCitizenForm client:load apiUrl={apiUrl} />
+        <RegisterCommitteeForm client:load apiUrl={apiUrl} />
       </div>
 
       <p class="text-center text-sm text-concrete mt-4">

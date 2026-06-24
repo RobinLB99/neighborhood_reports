@@ -1,6 +1,6 @@
 ---
 import Layout from '@shared/layouts/Layout.astro';
-import LoginForm from '@modules/auth/LoginForm';
+import LoginForm from '@modules/auth/ui/LoginForm';
 
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 const registered = Astro.url.searchParams.get('registered') === 'true';
@@ -32,11 +32,17 @@ const registered = Astro.url.searchParams.get('registered') === 'true';
         <LoginForm client:load apiUrl={apiUrl} />
       </div>
 
-      <p class="text-center text-sm text-concrete mt-4">
-        ¿No tienes cuenta?{' '}
-        <a href="/register" class="text-graphite font-medium underline underline-offset-2">
-          Funda tu comité
-        </a>
+      <p class="text-center text-sm text-concrete mt-4 flex flex-col gap-1">
+        <span>¿No tienes cuenta?</span>
+        <span class="flex justify-center gap-3">
+          <a href="/register" class="text-graphite font-medium underline underline-offset-2">
+            Regístrate como vecino
+          </a>
+          <span class="text-concrete">·</span>
+          <a href="/fundar-comite" class="text-graphite font-medium underline underline-offset-2">
+            Funda tu comité
+          </a>
+        </span>
       </p>
 
     </div>

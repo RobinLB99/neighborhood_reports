@@ -9,7 +9,7 @@ interface Props {
   apiUrl: string;
 }
 
-export default function RegisterForm({ apiUrl }: Props) {
+export default function RegisterCommitteeForm({ apiUrl }: Props) {
   const [nombre, setNombre] = useState('');
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -83,7 +83,7 @@ export default function RegisterForm({ apiUrl }: Props) {
     setError(null);
 
     try {
-      const res = await fetch(`${apiUrl}/api/committee/register-first`, {
+      const res = await fetch(`${apiUrl}/api/auth/register-leader`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -131,7 +131,7 @@ export default function RegisterForm({ apiUrl }: Props) {
       {/* Nombre */}
       <div class="flex flex-col gap-1.5">
         <label for="reg-nombre" class="text-sm font-medium text-graphite">
-          Nombre completo
+          Nombre completo del líder
         </label>
         <input
           id="reg-nombre"
@@ -187,7 +187,7 @@ export default function RegisterForm({ apiUrl }: Props) {
       {/* Separador territorio */}
       <div class="border-t border-hairline pt-2">
         <p class="text-xs font-medium text-concrete uppercase tracking-widest mb-3">
-          Ubicación del comité
+          Ubicación del nuevo comité
         </p>
 
         {/* Provincia */}
@@ -276,7 +276,7 @@ export default function RegisterForm({ apiUrl }: Props) {
         disabled={loading || !barrioId}
         class="bg-graphite text-chalk text-sm font-medium rounded-lg px-4 py-3 hover:bg-carbon disabled:opacity-50 transition-colors mt-1 cursor-pointer disabled:cursor-not-allowed"
       >
-        {loading ? 'Registrando comité...' : 'Fundar comité barrial'}
+        {loading ? 'Registrando...' : 'Fundar comité barrial'}
       </button>
     </form>
   );
