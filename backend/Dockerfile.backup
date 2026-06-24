@@ -4,13 +4,10 @@ FROM docker.io/library/node:24-alpine3.24 AS builder
 
 WORKDIR /app
 
-# Habilitamos Corepack para usar la versión de pnpm definida en el proyecto
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-
 # Copiamos los archivos de definición de dependencias y workspace
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+RUN npm install -g pnpm
 
 # Instalamos las dependencias necesarias de manera limpia (respetando el lockfile)
 RUN pnpm install --frozen-lockfile
@@ -25,10 +22,8 @@ FROM docker.io/library/node:24-alpine3.24 AS runner
 
 WORKDIR /app
 
-# Habilitamos Corepack también en la etapa de ejecución
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+# Instalamos pnpm globalmente para garantizar que esté disponible en el PATH del runner
+RUN npm install -g pnpm
 
 # Copiamos el código fuente y las dependencias preparadas en el stage builder
 COPY --from=builder /app /app
