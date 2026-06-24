@@ -8,12 +8,7 @@ export interface CommitteeRepository {
    */
   registerFirstMember(
     committee: Committee,
-    userPayload: {
-      nombre: string;
-      usuario: string;
-      contrasenaHash: string;
-      barrioId: number;
-    },
+    usuarioId: number,
     member: CommitteeMember
   ): Promise<{
     committeeId: number;

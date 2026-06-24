@@ -1,25 +1,26 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleCors } from '../../src/shared-kernel/http/cors.js';
+import { getAuthenticatedUser } from '../../src/shared-kernel/http/auth.js';
 import { RegisterFirstMemberSchema } from '../../src/committee/application/dtos/RegisterFirstMemberDto.js';
 import { DrizzleCommitteeRepository } from '../../src/committee/infrastructure/database/DrizzleCommitteeRepository.js';
 import { RegisterFirstMemberUseCase } from '../../src/committee/application/use-cases/RegisterFirstMember.js';
 import {
   CommitteeAlreadyExistsError,
-  UsernameAlreadyTakenError,
   BarrioNotFoundError,
 } from '../../src/shared-kernel/errors/DomainErrors.js';
 
 /**
  * Handler HTTP POST /api/committee/register-first (Driving Adapter).
  * 
- * Permite fundar un comité barrial y registrar al primer miembro administrador (Presidente).
+ * Permite fundar un comité barrial para el usuario autenticado (Presidente).
  * 
  * Flujo:
  * 1. Resuelve políticas CORS.
- * 2. Valida la estructura y tipos del body de la petición mediante `RegisterFirstMemberSchema`.
- * 3. Inyecta manualmente `DrizzleCommitteeRepository` en `RegisterFirstMemberUseCase`.
- * 4. Ejecuta la lógica transaccional de negocio para crear el comité y vincular el usuario fundador.
- * 5. Gestiona las excepciones del negocio (conflictos de duplicidad, barrios inexistentes).
+ * 2. Extrae de forma segura el contexto de identidad del usuario desde cabeceras.
+ * 3. Valida el barrioId del body mediante `RegisterFirstMemberSchema`.
+ * 4. Inyecta manualmente `DrizzleCommitteeRepository` en `RegisterFirstMemberUseCase`.
+ * 5. Ejecuta la lógica transaccional para crear el comité y vincular al usuario como Presidente.
+ * 6. Gestiona las excepciones del negocio.
  * 
  * @param request Petición entrante del cliente con los datos de fundación del comité.
  * @param response Respuesta HTTP de éxito o error emitida.
@@ -39,7 +40,10 @@ export default async function handler(request: VercelRequest, response: VercelRe
   }
 
   try {
-    // 2. Validación estricta del contrato de entrada mediante Zod
+    // 2. Extraer contexto de identidad inyectado por el Edge Middleware
+    const userContext = getAuthenticatedUser(request);
+
+    // 3. Validación estricta del contrato de entrada mediante Zod
     const result = RegisterFirstMemberSchema.safeParse(request.body);
 
     if (!result.success) {
@@ -54,12 +58,12 @@ export default async function handler(request: VercelRequest, response: VercelRe
       });
     }
 
-    // 3. Inyección Manual de Dependencias (Mitiga tiempos de Cold Start)
+    // 4. Inyección Manual de Dependencias
     const repository = new DrizzleCommitteeRepository();
     const useCase = new RegisterFirstMemberUseCase(repository);
 
-    // 4. Ejecución del Caso de Uso
-    const output = await useCase.execute(result.data);
+    // 5. Ejecución del Caso de Uso
+    const output = await useCase.execute(userContext.userId, result.data);
 
     console.info(`[Success] Comité barrial fundado en barrio ${result.data.barrioId} por usuario ID ${output.usuarioId}`);
 
@@ -72,8 +76,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
       },
     });
   } catch (error) {
-    // 5. Manejo estructurado de errores y protección de stack traces
-    if (error instanceof CommitteeAlreadyExistsError || error instanceof UsernameAlreadyTakenError) {
+    // 6. Manejo estructurado de errores
+    if (error instanceof CommitteeAlreadyExistsError) {
       console.warn(`[Domain Business Warning] ${error.message}`);
       return response.status(409).json({
         error: 'Conflict',
@@ -88,6 +92,14 @@ export default async function handler(request: VercelRequest, response: VercelRe
         error: 'Not Found',
         message: error.message,
         code: error.code,
+      });
+    }
+
+    if (error instanceof Error && error.message.includes("Falta el contexto de usuario")) {
+      console.error("[Security Configuration Error] Cabeceras de middleware ausentes:", error.message);
+      return response.status(500).json({
+        error: 'Internal Server Error',
+        message: 'Error de configuración de seguridad interna en el servidor.',
       });
     }
 

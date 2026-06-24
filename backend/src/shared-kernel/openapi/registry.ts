@@ -1,6 +1,7 @@
 import { extendZodWithOpenApi, OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 import { LoginSchema } from "../../authentication/application/dtos/LoginDto.js";
+import { RegisterUserSchema } from "../../authentication/application/dtos/RegisterUserDto.js";
 import { RegisterFirstMemberSchema } from "../../committee/application/dtos/RegisterFirstMemberDto.js";
 import { GetCitiesSchema } from "../../territory/application/dtos/GetCitiesDto.js";
 import { GetNeighborhoodsSchema } from "../../territory/application/dtos/GetNeighborhoodsDto.js";
@@ -35,6 +36,18 @@ const RegisterFirstMemberResponseSchema = registry.register("RegisterFirstMember
     comiteId: z.number(),
     usuarioId: z.number(),
     miembroId: z.number(),
+  }),
+}));
+
+const RegisterUserResponseSchema = registry.register("RegisterUserResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    id: z.number(),
+    nombre: z.string(),
+    usuario: z.string(),
+    rol: z.string(),
+    barrioId: z.number(),
+    fechaRegistro: z.string().optional(),
   }),
 }));
 
@@ -117,6 +130,44 @@ registry.registerPath({
 });
 
 registry.registerPath({
+  method: "post",
+  path: "/api/auth/register",
+  summary: "Registrar usuario",
+  description: "Permite registrar un nuevo usuario en la plataforma con el rol de ciudadano.",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: RegisterUserSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Usuario registrado exitosamente.",
+      content: {
+        "application/json": {
+          schema: RegisterUserResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "El payload enviado no cumple con las validaciones requeridas.",
+    },
+    404: {
+      description: "Barrio no encontrado.",
+    },
+    409: {
+      description: "Conflicto: El nombre de usuario ya está en uso.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
   method: "get",
   path: "/api/auth/me",
   summary: "Obtener perfil del usuario",
@@ -147,7 +198,8 @@ registry.registerPath({
   method: "post",
   path: "/api/committee/register-first",
   summary: "Fundar un comité barrial",
-  description: "Permite fundar un comité barrial y registrar al primer miembro administrador (Presidente).",
+  description: "Permite fundar un comité barrial para el usuario autenticado (Presidente).",
+  security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
@@ -169,11 +221,14 @@ registry.registerPath({
     400: {
       description: "El payload enviado no cumple con las validaciones requeridas.",
     },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
     404: {
       description: "Barrio no encontrado.",
     },
     409: {
-      description: "Conflicto por duplicidad (el comité o el usuario ya existen).",
+      description: "Conflicto por duplicidad (el comité ya existe para este barrio).",
     },
     500: {
       description: "Error interno del servidor.",

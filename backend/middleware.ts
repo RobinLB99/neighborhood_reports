@@ -16,7 +16,6 @@ import { jwtVerify } from 'jose';
  */
 const PUBLIC_PATHS = [
     "/api/health",
-    "/api/committee/register-first",
     "/api/auth/login",
     "/api/auth/register",
     "/api/territory/province",

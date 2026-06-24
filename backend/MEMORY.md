@@ -26,6 +26,17 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ---
 
+## 🏛️ Decisiones de Diseño y Dominio
+
+### 1. Desacoplamiento de Registro de Usuario y Fundación de Comité (ADR 0003)
+*   **Contexto:** La creación del líder (usuario) estaba acoplada a la fundación del comité, violando SRP y dificultando la creación independiente de otros roles (ciudadano, miembro).
+*   **Decisión:** Separar la lógica creando `RegisterUserUseCase` en el dominio `authentication` (`POST /api/auth/register`) con rol por defecto `ciudadano`. La fundación del comité (`POST /api/committee/register-first`) ahora requiere autenticación JWT y promueve el rol del usuario a `lider` de forma atómica en base de datos.
+*   **Consecuencias:**
+    *   **Positivas:** Separación clara de responsabilidades, endpoints protegidos, extensibilidad para registros genéricos.
+    *   **Negativas:** Cambio de contrato en el API que requiere flujo de múltiples pasos en el cliente.
+
+---
+
 ## 🛡️ Decisiones de Seguridad
 
 ### 1. Implementación de Vercel Edge Middleware Global (`middleware.ts`)

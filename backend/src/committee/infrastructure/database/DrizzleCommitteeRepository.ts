@@ -1,24 +1,19 @@
+import { eq } from "drizzle-orm";
 import { db } from "../../../shared-kernel/database/drizzle.js";
 import { Committee } from "../../domain/entities/Committee.js";
 import { CommitteeMember } from "../../domain/entities/CommitteeMember.js";
 import type { CommitteeRepository } from "../../domain/repositories/CommitteeRepository.interface.js";
 import { comites, miembrosComite } from "./schema.js";
-import { usuarios } from "../../../authentication/infrastructure/database/schema.js";
+import { usuarios, roles } from "../../../authentication/infrastructure/database/schema.js";
 import {
   CommitteeAlreadyExistsError,
-  UsernameAlreadyTakenError,
   BarrioNotFoundError,
 } from "../../../shared-kernel/errors/DomainErrors.js";
 
 export class DrizzleCommitteeRepository implements CommitteeRepository {
   async registerFirstMember(
     committee: Committee,
-    userPayload: {
-      nombre: string;
-      usuario: string;
-      contrasenaHash: string;
-      barrioId: number;
-    },
+    usuarioId: number,
     member: CommitteeMember
   ): Promise<{
     committeeId: number;
@@ -27,6 +22,17 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
   }> {
     try {
       return await db.transaction(async (tx) => {
+        // 0. Obtener el ID del rol 'lider'
+        const [dbRole] = await tx
+          .select({ id: roles.id })
+          .from(roles)
+          .where(eq(roles.nombre, "lider"))
+          .limit(1);
+
+        if (!dbRole) {
+          throw new Error("El rol 'lider' no se encuentra configurado en el sistema.");
+        }
+
         // 1. Intentamos crear el comité barrial.
         // Si ya existe uno para este barrioId, fallará con Unique Constraint Violation.
         const [insertedCommittee] = await tx
@@ -40,30 +46,18 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
           throw new Error("No se pudo insertar el comité barrial.");
         }
 
-        // 2. Intentamos insertar el usuario en la tabla usuarios.
-        // Su rol inicial por defecto en la tabla general de usuarios será "Lider".
-        // Si el nombre de usuario ya existe, fallará con Unique Constraint Violation.
-        const [insertedUser] = await tx
-          .insert(usuarios)
-          .values({
-            nombre: userPayload.nombre,
-            usuario: userPayload.usuario,
-            contrasenaHash: userPayload.contrasenaHash,
-            barrioId: userPayload.barrioId,
-            rol: "Lider", // Definido como Líder para gestiones
-          })
-          .returning({ id: usuarios.id });
-
-        if (!insertedUser) {
-          throw new Error("No se pudo registrar el usuario fundador.");
-        }
+        // 2. Promover al usuario al rol de Líder en la tabla general de usuarios
+        await tx
+          .update(usuarios)
+          .set({ rolId: dbRole.id })
+          .where(eq(usuarios.id, usuarioId));
 
         // 3. Asignamos al usuario como miembro y presidente en miembrosComite.
         const [insertedMember] = await tx
           .insert(miembrosComite)
           .values({
             comiteId: insertedCommittee.id,
-            usuarioId: insertedUser.id,
+            usuarioId: usuarioId,
             rol: member.rol, // 'Presidente'
           })
           .returning({ id: miembrosComite.id });
@@ -74,7 +68,7 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
 
         return {
           committeeId: insertedCommittee.id,
-          usuarioId: insertedUser.id,
+          usuarioId: usuarioId,
           miembroId: insertedMember.id,
         };
       });
@@ -86,13 +80,10 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
         const message = error.message || "";
 
         // Código de error Postgres 23505: Violación de índice único
-        if (code === "23505" || code === "23505") {
+        if (code === "23505") {
           // El nombre del índice o constraint generado por Drizzle suele incluir el nombre de la tabla y columna
           if (message.includes("comites_barrio_id_unique") || detail.includes("barrio_id") || message.includes("barrio_id")) {
             throw new CommitteeAlreadyExistsError(committee.barrioId);
-          }
-          if (message.includes("usuarios_usuario_unique") || detail.includes("usuario") || message.includes("usuario")) {
-            throw new UsernameAlreadyTakenError(userPayload.usuario);
           }
         }
 
