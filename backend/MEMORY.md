@@ -130,6 +130,13 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Solución robusta al orden de ejecución en ES Modules que permite usar libremente la API fluida `.openapi()` de Zod en DTOs autodeclarados.
     *   **Negativas:** Ninguna.
 
+### 4. Documentación de Variables de Entorno de Cloudinary en `.env.example`
+*   **Contexto:** La introducción de firmas criptográficas para Cloudinary requiere que cualquier desarrollador configure localmente sus credenciales de Cloudinary. Sin embargo, estas no estaban documentadas en el archivo de plantilla `.env.example`.
+*   **Decisión:** Se agregaron las variables de entorno `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET` al archivo `.env.example` con comentarios instructivos.
+*   **Consecuencias:**
+    *   **Positivas:** Evita fallos de arranque silenciosos en nuevos entornos y facilita el onboarding de desarrollo.
+    *   **Negativas:** Ninguna.
+
 ---
 
 ## 📋 Tareas Pendientes e Hitos Inmediatos
