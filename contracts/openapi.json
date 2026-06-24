@@ -107,6 +107,116 @@
           "message",
           "data"
         ]
+      },
+      "ProvincesResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "nombre": {
+                  "type": "string"
+                },
+                "fechaCreacion": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "nombre"
+              ]
+            }
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "CitiesResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "provinciaId": {
+                  "type": "number"
+                },
+                "nombre": {
+                  "type": "string"
+                },
+                "fechaCreacion": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "provinciaId",
+                "nombre"
+              ]
+            }
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "NeighborhoodsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "ciudadId": {
+                  "type": "number"
+                },
+                "nombre": {
+                  "type": "string"
+                },
+                "fechaCreacion": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "ciudadId",
+                "nombre"
+              ]
+            }
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
       }
     },
     "parameters": {}
@@ -253,6 +363,105 @@
           },
           "409": {
             "description": "Conflicto por duplicidad (el comité o el usuario ya existen)."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/territory/province": {
+      "get": {
+        "summary": "Obtener todas las provincias",
+        "description": "Recupera la lista completa de provincias registradas en el sistema para su uso en formularios de registro.",
+        "responses": {
+          "200": {
+            "description": "Catálogo de provincias recuperado con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProvincesResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/territory/city": {
+      "get": {
+        "summary": "Obtener ciudades por provincia",
+        "description": "Recupera las ciudades asociadas a una provincia específica mediante su ID.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "provinceId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ciudades recuperadas con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitiesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El ID de la provincia proporcionado es inválido."
+          },
+          "404": {
+            "description": "Provincia no encontrada."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/territory/neighborhood": {
+      "get": {
+        "summary": "Obtener barrios por ciudad",
+        "description": "Recupera los barrios asociados a una ciudad específica mediante su ID.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "cityId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Barrios recuperados con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeighborhoodsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El ID de la ciudad proporcionado es inválido."
+          },
+          "404": {
+            "description": "Ciudad no encontrada."
           },
           "500": {
             "description": "Error interno del servidor."

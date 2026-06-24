@@ -15,10 +15,13 @@ import { jwtVerify } from 'jose';
  * 4. Retornar respuestas rápidas 401 sin incurrir en latencias de base de datos ni tiempos de cold start del backend.
  */
 const PUBLIC_PATHS = [
-  '/api/health',
-  '/api/committee/register-first',
-  '/api/auth/login',
-  '/api/auth/register',
+    "/api/health",
+    "/api/committee/register-first",
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/territory/province",
+    "/api/territory/city",
+    "/api/territory/neighborhood",
 ];
 
 export default async function middleware(request: Request) {

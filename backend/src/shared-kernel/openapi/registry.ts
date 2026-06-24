@@ -2,6 +2,8 @@ import { extendZodWithOpenApi, OpenAPIRegistry } from "@asteasolutions/zod-to-op
 import { z } from "zod";
 import { LoginSchema } from "../../authentication/application/dtos/LoginDto.js";
 import { RegisterFirstMemberSchema } from "../../committee/application/dtos/RegisterFirstMemberDto.js";
+import { GetCitiesSchema } from "../../territory/application/dtos/GetCitiesDto.js";
+import { GetNeighborhoodsSchema } from "../../territory/application/dtos/GetNeighborhoodsDto.js";
 
 // Extend Zod to support the .openapi() extension method
 extendZodWithOpenApi(z);
@@ -34,6 +36,41 @@ const RegisterFirstMemberResponseSchema = registry.register("RegisterFirstMember
     usuarioId: z.number(),
     miembroId: z.number(),
   }),
+}));
+
+const ProvinceSchema = z.object({
+  id: z.number(),
+  nombre: z.string(),
+  fechaCreacion: z.date().optional(),
+});
+
+const CitySchema = z.object({
+  id: z.number(),
+  provinciaId: z.number(),
+  nombre: z.string(),
+  fechaCreacion: z.date().optional(),
+});
+
+const NeighborhoodSchema = z.object({
+  id: z.number(),
+  ciudadId: z.number(),
+  nombre: z.string(),
+  fechaCreacion: z.date().optional(),
+});
+
+const ProvincesResponseSchema = registry.register("ProvincesResponse", z.object({
+  message: z.string(),
+  data: z.array(ProvinceSchema),
+}));
+
+const CitiesResponseSchema = registry.register("CitiesResponse", z.object({
+  message: z.string(),
+  data: z.array(CitySchema),
+}));
+
+const NeighborhoodsResponseSchema = registry.register("NeighborhoodsResponse", z.object({
+  message: z.string(),
+  data: z.array(NeighborhoodSchema),
 }));
 
 // Register Security Scheme
@@ -137,6 +174,84 @@ registry.registerPath({
     },
     409: {
       description: "Conflicto por duplicidad (el comité o el usuario ya existen).",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/territory/province",
+  summary: "Obtener todas las provincias",
+  description: "Recupera la lista completa de provincias registradas en el sistema para su uso en formularios de registro.",
+  responses: {
+    200: {
+      description: "Catálogo de provincias recuperado con éxito.",
+      content: {
+        "application/json": {
+          schema: ProvincesResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/territory/city",
+  summary: "Obtener ciudades por provincia",
+  description: "Recupera las ciudades asociadas a una provincia específica mediante su ID.",
+  request: {
+    query: GetCitiesSchema,
+  },
+  responses: {
+    200: {
+      description: "Ciudades recuperadas con éxito.",
+      content: {
+        "application/json": {
+          schema: CitiesResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "El ID de la provincia proporcionado es inválido.",
+    },
+    404: {
+      description: "Provincia no encontrada.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/territory/neighborhood",
+  summary: "Obtener barrios por ciudad",
+  description: "Recupera los barrios asociados a una ciudad específica mediante su ID.",
+  request: {
+    query: GetNeighborhoodsSchema,
+  },
+  responses: {
+    200: {
+      description: "Barrios recuperados con éxito.",
+      content: {
+        "application/json": {
+          schema: NeighborhoodsResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "El ID de la ciudad proporcionado es inválido.",
+    },
+    404: {
+      description: "Ciudad no encontrada.",
     },
     500: {
       description: "Error interno del servidor.",
