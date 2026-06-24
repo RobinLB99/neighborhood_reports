@@ -15,15 +15,23 @@ import { jwtVerify } from 'jose';
  * 4. Retornar respuestas rápidas 401 sin incurrir en latencias de base de datos ni tiempos de cold start del backend.
  */
 const PUBLIC_PATHS = [
-  '/api/health',
-  '/api/committee/register-first',
-  '/api/auth/login',
-  '/api/auth/register',
+    "/api/health",
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/auth/register-leader",
+    "/api/territory/province",
+    "/api/territory/city",
+    "/api/territory/neighborhood",
 ];
 
 export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
+
+  // Dejar pasar preflight CORS — OPTIONS nunca lleva Authorization header
+  if (request.method === 'OPTIONS') {
+    return next();
+  }
 
   // 1. Omitir validación para rutas públicas conocidas
   if (PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(path + '/'))) {

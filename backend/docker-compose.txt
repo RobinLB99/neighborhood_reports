@@ -1,0 +1,21 @@
+node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: reports-backend-node:latest
+    container_name: reports-backend-node
+    command: pnpm exec vercel dev --listen 3000 --yes
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://neon:npg@postgres:5432/neondb
+      - NODE_ENV=development
+      - CI=true
+    depends_on:
+      - postgres

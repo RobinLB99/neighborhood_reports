@@ -1,0 +1,50 @@
+---
+import Layout from '@shared/layouts/Layout.astro';
+import LoginForm from '@modules/auth/ui/LoginForm';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
+const registered = Astro.url.searchParams.get('registered') === 'true';
+---
+
+<Layout title="Iniciar sesión — Reportes Barriales">
+  <main class="min-h-screen bg-chalk flex items-center justify-center p-4">
+    <div class="w-full max-w-sm">
+
+      <div class="mb-8">
+        <p class="text-xs font-medium text-concrete uppercase tracking-widest mb-3">
+          Infraestructura Urbana · Guayaquil
+        </p>
+        <h1 class="text-2xl font-semibold text-graphite">
+          Iniciar sesión
+        </h1>
+        <p class="text-sm text-concrete mt-1">
+          Accede a tu cuenta del sistema de reportes barriales.
+        </p>
+      </div>
+
+      {registered && (
+        <div class="mb-4 text-sm text-graphite bg-mist border border-hairline rounded-lg px-3 py-2.5">
+          Comité registrado exitosamente. Ahora puedes iniciar sesión.
+        </div>
+      )}
+
+      <div class="bg-chalk border border-hairline rounded-xl p-6">
+        <LoginForm client:load apiUrl={apiUrl} />
+      </div>
+
+      <p class="text-center text-sm text-concrete mt-4 flex flex-col gap-1">
+        <span>¿No tienes cuenta?</span>
+        <span class="flex justify-center gap-3">
+          <a href="/register" class="text-graphite font-medium underline underline-offset-2">
+            Regístrate como vecino
+          </a>
+          <span class="text-concrete">·</span>
+          <a href="/fundar-comite" class="text-graphite font-medium underline underline-offset-2">
+            Funda tu comité
+          </a>
+        </span>
+      </p>
+
+    </div>
+  </main>
+</Layout>

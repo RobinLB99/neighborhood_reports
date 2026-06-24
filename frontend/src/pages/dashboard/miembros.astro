@@ -1,0 +1,10 @@
+---
+import Layout from '@shared/layouts/Layout.astro';
+import CommitteeManager from '@modules/committee/ui/CommitteeManager';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
+---
+
+<Layout title="Miembros del Comité — Reportes Barriales">
+  <CommitteeManager client:load apiUrl={apiUrl} />
+</Layout>

@@ -12,4 +12,20 @@ export interface AuthRepository {
    * Retorna null si no se encuentra.
    */
   findById(id: number): Promise<User | null>;
+
+  /**
+   * Registra un nuevo usuario en la base de datos.
+   */
+  register(user: User): Promise<User>;
+
+  /**
+   * Actualiza el rol de un usuario en el sistema.
+   */
+  updateUserRole(userId: number, roleName: string): Promise<void>;
+
+  /**
+   * Busca vecinos de un barrio que sean elegibles para formar parte del comité.
+   * (Normalmente usuarios con el rol de ciudadano).
+   */
+  findEligibleNeighborsByBarrio(barrioId: number): Promise<User[]>;
 }
