@@ -25,6 +25,11 @@ export default async function middleware(request: Request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
+  // Dejar pasar preflight CORS — OPTIONS nunca lleva Authorization header
+  if (request.method === 'OPTIONS') {
+    return next();
+  }
+
   // 1. Omitir validación para rutas públicas conocidas
   if (PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(path + '/'))) {
     return next();
