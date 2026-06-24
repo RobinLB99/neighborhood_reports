@@ -29,6 +29,12 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Arquitectura Hexagonal (Dominio y Aplicación):** Se estructuró el módulo `committee` con entidades de dominio (`CommitteeMember`, `Neighbor`), puerto del repositorio (`CommitteeRepository`), casos de uso dedicados (`GetCommitteeMembersUseCase`, `GetEligibleNeighborsUseCase`, `RegisterCommitteeMemberUseCase`) e implementación de infraestructura (`HttpCommitteeRepository`).
         *   **Capa UI e Integración:** Se implementaron islas reactivas con Preact (`CommitteeManager`, `CommitteeMembersList`, `RegisterMemberForm`) respetando el sistema de diseño brutalista monocromático y las pautas táctiles de accesibilidad (objetivos de toque > 44px).
         *   **Ruta de Entrega (Delivery):** Se integró la nueva ruta `/dashboard/miembros` mediante la página Astro `src/pages/dashboard/miembros.astro` y se enlazó desde el panel principal en el `Dashboard`.
+4.  **Módulo de Registro de Incidencias Barriales y Subidas Firmadas a Cloudinary [2026-06-24]:**
+    *   *Impacto técnico:*
+        *   **Orquestación asíncrona en 3 pasos:** Se implementó `ReportIncidentUseCase` para dividir la subida en: 1) Solicitud de firma temporal HMAC-SHA1 al backend, 2) Carga directa de la imagen binaria desde el cliente a Cloudinary, 3) Envío del payload final (con URL optimizada de imagen `q_auto,f_auto` y coordenadas) al backend.
+        *   **Geolocalización y Mapa:** Se integró la librería Leaflet con mapas base de OpenStreetMap dentro de la isla reactiva de Preact `ReportIncidentForm.tsx`, permitiendo seleccionar coordenadas exactas (`latitud,longitud`) de forma visual e intuitiva y/o usar geolocalización nativa del navegador.
+        *   **Floating Action Button (FAB):** Se agregó un botón flotante con el ícono `+` en el `Dashboard` (`Dashboard.tsx`) anclado en `fixed bottom-6 right-6` para acceso rápido y limpio al reporte, removiendo el banner estático redundante que ocupaba espacio visual principal.
+        *   **Manejo de Errores y Tolerancia a Fallos:** Se encapsularon los errores en excepciones de dominio y se implementó una máquina de estados visual (`useIncidentForm`) que preserva la imagen pre-subida si falla el paso final, evitando la redundancia de red al reintentar el registro.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
