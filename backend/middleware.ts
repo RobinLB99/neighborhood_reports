@@ -18,6 +18,7 @@ const PUBLIC_PATHS = [
     "/api/health",
     "/api/auth/login",
     "/api/auth/register",
+    "/api/auth/register-leader",
     "/api/territory/province",
     "/api/territory/city",
     "/api/territory/neighborhood",

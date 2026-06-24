@@ -77,7 +77,7 @@
           "data"
         ]
       },
-      "RegisterFirstMemberResponse": {
+      "RegisterCommitteeResponse": {
         "type": "object",
         "properties": {
           "message": {
@@ -412,21 +412,29 @@
         }
       }
     },
-    "/api/committee/register-first": {
+    "/api/auth/register-leader": {
       "post": {
-        "summary": "Fundar un comité barrial",
-        "description": "Permite fundar un comité barrial para el usuario autenticado (Presidente).",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "summary": "Registrar líder y fundar comité",
+        "description": "Permite fundar un comité barrial y dar de alta a su líder de forma pública en un solo paso.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 3
+                  },
+                  "usuario": {
+                    "type": "string",
+                    "minLength": 3,
+                    "pattern": "^[a-z0-9_]+$"
+                  },
+                  "contrasena": {
+                    "type": "string",
+                    "minLength": 6
+                  },
                   "barrioId": {
                     "type": "integer",
                     "minimum": 0,
@@ -434,6 +442,9 @@
                   }
                 },
                 "required": [
+                  "nombre",
+                  "usuario",
+                  "contrasena",
                   "barrioId"
                 ]
               }
@@ -442,11 +453,11 @@
         },
         "responses": {
           "201": {
-            "description": "Comité barrial registrado exitosamente.",
+            "description": "Comité barrial y líder registrados exitosamente.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegisterFirstMemberResponse"
+                  "$ref": "#/components/schemas/RegisterCommitteeResponse"
                 }
               }
             }
@@ -454,14 +465,11 @@
           "400": {
             "description": "El payload enviado no cumple con las validaciones requeridas."
           },
-          "401": {
-            "description": "No autorizado o token JWT inválido."
-          },
           "404": {
             "description": "Barrio no encontrado."
           },
           "409": {
-            "description": "Conflicto por duplicidad (el comité ya existe para este barrio)."
+            "description": "Conflicto por duplicidad de usuario o de comité en el barrio."
           },
           "500": {
             "description": "Error interno del servidor."

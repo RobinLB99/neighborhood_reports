@@ -28,12 +28,20 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 🏛️ Decisiones de Diseño y Dominio
 
-### 1. Desacoplamiento de Registro de Usuario y Fundación de Comité (ADR 0003)
-*   **Contexto:** La creación del líder (usuario) estaba acoplada a la fundación del comité, violando SRP y dificultando la creación independiente de otros roles (ciudadano, miembro).
-*   **Decisión:** Separar la lógica creando `RegisterUserUseCase` en el dominio `authentication` (`POST /api/auth/register`) con rol por defecto `ciudadano`. La fundación del comité (`POST /api/committee/register-first`) ahora requiere autenticación JWT y promueve el rol del usuario a `lider` de forma atómica en base de datos.
+### 1. Desacoplamiento de Registro de Usuario y Fundación de Comité (ADR 0003 - Superado por ADR 0004)
+*   **Contexto:** La creación del líder (usuario) estaba acoplada a la fundación del comité, violando SRP y dificultando la creación independiente de otros roles.
+*   **Decisión:** Separar la lógica creando `RegisterUserUseCase` en `authentication` (`POST /api/auth/register`) para ciudadanos normales. La fundación del comité requería autenticación JWT previa.
+*   **Estado:** *Superado* por el ADR 0004 para eliminar la fricción del onboarding.
+
+### 2. Alta Pública y Atómica del Líder Fundador y Comité Barrial (ADR 0004)
+*   **Contexto:** El flujo en dos pasos del ADR 0003 generaba demasiada fricción para los líderes del comité. Se requería que el registro del comité y de su líder fundador fuese público (sin token), pero de manera segura y atómica para evitar comités huérfanos o suplantaciones.
+*   **Decisión:** Implementar un endpoint de registro unificado `/api/auth/register-leader` liberado en el middleware de Vercel. El controlador delega en `RegisterCommitteeUseCase` (dentro de `src/committee`), el cual ejecuta una única transacción de base de datos (`db.transaction`) que:
+    1. Registra al usuario en la tabla `usuarios` (con la contraseña hasheada y asignándole directamente el rol `lider`).
+    2. Registra el comité en la tabla `comites` para el `barrioId` (garantizando un solo comité por barrio).
+    3. Asigna la membresía directiva en `miembros_comite` con el rol de "Presidente".
 *   **Consecuencias:**
-    *   **Positivas:** Separación clara de responsabilidades, endpoints protegidos, extensibilidad para registros genéricos.
-    *   **Negativas:** Cambio de contrato en el API que requiere flujo de múltiples pasos en el cliente.
+    *   **Positivas:** Registro en un solo paso libre de tokens JWT para los líderes. Transaccionalidad al 100% (consistencia dura). Coherencia en la API al ubicar todos los registros públicos bajo el prefijo `/api/auth/*`.
+    *   **Negativas:** Introduce una dependencia directa del dominio `src/committee` hacia las entidades de usuario (`User`) y el helper de hash del kernel.
 
 ---
 
@@ -94,6 +102,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 - [x] Diseñar e implementar el script de sembrado de territorio (`pnpm db:seed`) con más de 100 barrios de Guayaquil.
 - [x] Desarrollar, desplegar y validar los casos de uso y endpoints del dominio `authentication` (`login` y `me`).
 - [x] Redactar la documentación técnica del backend, APIs y middlewares en [api-and-source-documentation.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/docs/api-and-source-documentation.md).
+- [x] Diseñar e implementar el flujo público y atómico de alta para líderes y comités barriales (ADR 0004).
 - [ ] Continuar estructurando las capas concéntricas de los dominios (`worker-profile`, `identity-validation`, etc.).
 
 

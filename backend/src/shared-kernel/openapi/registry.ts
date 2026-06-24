@@ -2,7 +2,7 @@ import { extendZodWithOpenApi, OpenAPIRegistry } from "@asteasolutions/zod-to-op
 import { z } from "zod";
 import { LoginSchema } from "../../authentication/application/dtos/LoginDto.js";
 import { RegisterUserSchema } from "../../authentication/application/dtos/RegisterUserDto.js";
-import { RegisterFirstMemberSchema } from "../../committee/application/dtos/RegisterFirstMemberDto.js";
+import { RegisterCommitteeSchema } from "../../committee/application/dtos/RegisterCommitteeDto.js";
 import { GetCitiesSchema } from "../../territory/application/dtos/GetCitiesDto.js";
 import { GetNeighborhoodsSchema } from "../../territory/application/dtos/GetNeighborhoodsDto.js";
 
@@ -30,7 +30,7 @@ const MeResponseSchema = registry.register("MeResponse", z.object({
   }),
 }));
 
-const RegisterFirstMemberResponseSchema = registry.register("RegisterFirstMemberResponse", z.object({
+const RegisterCommitteeResponseSchema = registry.register("RegisterCommitteeResponse", z.object({
   message: z.string(),
   data: z.object({
     comiteId: z.number(),
@@ -196,39 +196,35 @@ registry.registerPath({
 
 registry.registerPath({
   method: "post",
-  path: "/api/committee/register-first",
-  summary: "Fundar un comité barrial",
-  description: "Permite fundar un comité barrial para el usuario autenticado (Presidente).",
-  security: [{ bearerAuth: [] }],
+  path: "/api/auth/register-leader",
+  summary: "Registrar líder y fundar comité",
+  description: "Permite fundar un comité barrial y dar de alta a su líder de forma pública en un solo paso.",
   request: {
     body: {
       content: {
         "application/json": {
-          schema: RegisterFirstMemberSchema,
+          schema: RegisterCommitteeSchema,
         },
       },
     },
   },
   responses: {
     201: {
-      description: "Comité barrial registrado exitosamente.",
+      description: "Comité barrial y líder registrados exitosamente.",
       content: {
         "application/json": {
-          schema: RegisterFirstMemberResponseSchema,
+          schema: RegisterCommitteeResponseSchema,
         },
       },
     },
     400: {
       description: "El payload enviado no cumple con las validaciones requeridas.",
     },
-    401: {
-      description: "No autorizado o token JWT inválido.",
-    },
     404: {
       description: "Barrio no encontrado.",
     },
     409: {
-      description: "Conflicto por duplicidad (el comité ya existe para este barrio).",
+      description: "Conflicto por duplicidad de usuario o de comité en el barrio.",
     },
     500: {
       description: "Error interno del servidor.",
