@@ -546,6 +546,7 @@ const IncidentSchema = z.object({
 const ListReportsResponseSchema = registry.register("ListReportsResponse", z.object({
   message: z.string(),
   data: z.array(IncidentSchema),
+  nextCursor: z.string().nullable(),
 }));
 
 registry.registerPath({
@@ -557,6 +558,8 @@ registry.registerPath({
   request: {
     query: z.object({
       status: z.enum(["pendiente", "en_gestion", "solucionado", "all"]).optional().openapi({ description: "Filtrar por estado del reporte" }),
+      limit: z.coerce.number().optional().openapi({ description: "Límite de reportes a recuperar (por defecto 10)" }),
+      cursor: z.string().optional().openapi({ description: "Cursor (fecha ISO) para paginación" }),
     }),
   },
   responses: {

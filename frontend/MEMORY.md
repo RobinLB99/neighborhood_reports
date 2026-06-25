@@ -97,6 +97,16 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Integración de nprogress:** Se instaló y configuró la barra de progreso `nprogress` en un script global de Astro, enlazada a los eventos `astro:before-preparation` (inicio) y `astro:page-load` (cierre).
         *   **Estilos Monocromáticos:** Se diseñaron las reglas CSS de `#nprogress` en `global.css` para forzar una barra de 3px de color `var(--color-graphite)` (#0a0a0a) con una sombra difuminada del mismo color y ocultando el cargador circular predeterminado para mantener la sobriedad visual brutalista.
         *   **Optimización de Cargas y Caché:** Se refactorizó `useAuth.ts` para retornar inmediatamente `loading: false` si existe caché del usuario en `localStorage`. Para evitar errores de **hydration mismatch** al reconciliar el DOM virtual del cliente con el HTML del spinner del servidor, se actualizaron las rutas privadas `/dashboard` y `/dashboard/miembros` a `client:only="preact"`. Esto elimina por completo el parpadeo de carga global entre páginas y previene fallos en la cuadrícula de maquetación del navegador.
+15. **Paginación Basada en Cursor y Carga Incremental del Feed [2026-06-25]:**
+    *   **Impacto técnico:**
+        *   **Sincronización:** Actualizamos los tipos de contrato de la API en `src/shared/types/api.ts` mediante `pnpm sync-api` para soportar el formato paginado.
+        *   **Modularización y Repositorios:** Modificamos la interfaz `IncidentRepository.ts` y actualizamos el adaptador de infraestructura `HttpIncidentRepository.ts` para inyectar `limit` y `cursor` en la URL de consulta HTTP y mapear el `nextCursor` de respuesta.
+        *   **Caso de Uso:** Adaptamos `GetIncidentsUseCase.ts` para propagar el cursor y límite.
+        *   **Capa UI e Isla Reactiva (Preact):**
+            *   Refactorizamos `IncidentsFeed.tsx` inyectando los estados `nextCursor` y `loadingMore`.
+            *   Implementamos el método `loadMoreIncidents` para acumular nuevos reportes (`prev => [...prev, ...newData]`) de forma reactiva.
+            *   Diseñamos y renderizamos un botón de 44px de alto **"Cargar Más Reportes"** que aparece condicionalmente en la interfaz si hay más páginas (`nextCursor !== null`), deshabilitándolo con un estado visual de carga durante la petición HTTP.
+            *   Garantizamos que al cambiar de filtro de estados, el feed de incidencias se resetea por completo a su estado inicial.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.

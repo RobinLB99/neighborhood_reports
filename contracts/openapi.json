@@ -517,11 +517,16 @@
                 "descripcion"
               ]
             }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
           "message",
-          "data"
+          "data",
+          "nextCursor"
         ]
       },
       "ToggleSupportResponse": {
@@ -1340,6 +1345,27 @@
             "required": false,
             "description": "Filtrar por estado del reporte",
             "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "nullable": true,
+              "description": "Límite de reportes a recuperar (por defecto 10)"
+            },
+            "required": false,
+            "description": "Límite de reportes a recuperar (por defecto 10)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Cursor (fecha ISO) para paginación"
+            },
+            "required": false,
+            "description": "Cursor (fecha ISO) para paginación",
+            "name": "cursor",
             "in": "query"
           }
         ],

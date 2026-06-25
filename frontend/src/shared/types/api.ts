@@ -818,6 +818,10 @@ export interface paths {
                 query?: {
                     /** @description Filtrar por estado del reporte */
                     status?: "pendiente" | "en_gestion" | "solucionado" | "all";
+                    /** @description Límite de reportes a recuperar (por defecto 10) */
+                    limit?: number | null;
+                    /** @description Cursor (fecha ISO) para paginación */
+                    cursor?: string;
                 };
                 header?: never;
                 path?: never;
@@ -1468,6 +1472,7 @@ export interface components {
                 fechaCreacion?: string;
                 fechaActualizacion?: string;
             }[];
+            nextCursor: string | null;
         };
         ToggleSupportResponse: {
             message: string;

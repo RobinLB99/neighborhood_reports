@@ -26,6 +26,10 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
   const [selectedDirectiveIncidentId, setSelectedDirectiveIncidentId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   
+  // Estados para paginación por cursor
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+
   // Estados para eliminación lógica
   const [deleteIncidentId, setDeleteIncidentId] = useState<number | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
@@ -46,9 +50,10 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
 
     const apiFilter = statusFilter === 'all' ? undefined : statusFilter;
 
-    useCase.execute(apiUrl, token, apiFilter)
+    useCase.execute(apiUrl, token, apiFilter, 10, undefined)
       .then((data) => {
-        setIncidents(data);
+        setIncidents(data.incidents);
+        setNextCursor(data.nextCursor);
         setError(null);
       })
       .catch((err) => {
@@ -56,6 +61,29 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
       })
       .finally(() => {
         setLoading(false);
+      });
+  };
+
+  const loadMoreIncidents = () => {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+
+    const repository = new HttpIncidentRepository();
+    const useCase = new GetIncidentsUseCase(repository);
+
+    const apiFilter = statusFilter === 'all' ? undefined : statusFilter;
+
+    useCase.execute(apiUrl, token, apiFilter, 10, nextCursor)
+      .then((data) => {
+        setIncidents((prev) => [...prev, ...data.incidents]);
+        setNextCursor(data.nextCursor);
+      })
+      .catch((err) => {
+        console.error('Error al cargar más reportes:', err);
+        alert(err.message || 'Error al cargar más reportes.');
+      })
+      .finally(() => {
+        setLoadingMore(false);
       });
   };
 
@@ -322,6 +350,25 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
               )}
             </article>
           ))}
+
+          {nextCursor && (
+            <div class="mt-4 flex justify-center">
+              <button
+                onClick={loadMoreIncidents}
+                disabled={loadingMore}
+                class="inline-flex items-center justify-center text-xs font-semibold uppercase text-pure-black border border-pure-black rounded-lg px-6 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] w-full sm:w-auto disabled:opacity-50 select-none"
+              >
+                {loadingMore ? (
+                  <>
+                    <span class="inline-block animate-pulse w-4 h-4 border-2 border-pure-black border-t-transparent rounded-full mr-2"></span>
+                    Cargando...
+                  </>
+                ) : (
+                  'Cargar Más Reportes'
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

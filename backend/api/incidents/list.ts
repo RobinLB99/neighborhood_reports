@@ -40,16 +40,22 @@ export default async function handler(
 
     // 4. Ejecución del flujo de negocio
     const status = request.query.status as string | undefined;
-    const reports = await useCase.execute({
+    const limitQuery = request.query.limit;
+    const limit = limitQuery ? parseInt(limitQuery as string, 10) : undefined;
+    const cursor = request.query.cursor as string | undefined;
+
+    const result = await useCase.execute({
       barrioId: userContext.barrioId,
       estado: status,
+      limit,
+      cursor,
     });
 
-    console.info(`[Success] Se listaron ${reports.length} reportes para el barrio ID ${userContext.barrioId}.`);
+    console.info(`[Success] Se listaron ${result.reports.length} reportes para el barrio ID ${userContext.barrioId}. Siguiente cursor: ${result.nextCursor}`);
 
     return response.status(200).json({
       message: "Listado de reportes recuperado exitosamente.",
-      data: reports.map((report) => ({
+      data: result.reports.map((report) => ({
         id: report.id,
         usuarioId: report.usuarioId,
         barrioId: report.barrioId,
@@ -61,6 +67,7 @@ export default async function handler(
         fechaCreacion: report.fechaCreacion,
         fechaActualizacion: report.fechaActualizacion,
       })),
+      nextCursor: result.nextCursor,
     });
   } catch (error: any) {
     if (error instanceof Error && error.message.includes("Falta el contexto de usuario")) {

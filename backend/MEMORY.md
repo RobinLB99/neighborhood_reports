@@ -6,7 +6,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 📅 Estado y Contexto General
 *   **Fecha de Creación:** 20 de Junio, 2026
-*   **Última Actualización:** 25 de Junio, 2026 (por Jarvis - Refactorización de Roles de Usuario a PostgreSQL ENUM)
+*   **Última Actualización:** 25 de Junio, 2026 (por Jarvis - Implementación de Paginación Basada en Cursor)
 *   **Entorno Principal:** Node.js (Vercel Serverless Functions) con TypeScript
 *   **Arquitectura:** Concentrada en capas concéntricas (Dominio, Aplicación, Infraestructura) siguiendo Hexagonal, Clean y Screaming Architecture (detallado en [architecture.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/architecture.md)).
 
@@ -113,11 +113,14 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Seguridad total en la consulta basada en el JWT (evita que un líder consulte vecinos de otro barrio alterando parámetros). Cumple con el principio de menor privilegio.
     *   **Negativas:** El usuario solicitante debe tener obligatoriamente un `barrioId` asignado y válido en su JWT, de lo contrario se rechaza con HTTP 400.
 
-### 5. Consulta y Listado de Reportes Barriales Activos (GET /api/incidents/list)
-*   **Contexto:** Se requiere permitir a los usuarios autenticados (de cualquier rol) obtener un listado de reportes barriales activos (con estado `pendiente` o `en_gestion`) para su propio barrio.
-*   **Decisión:** El endpoint se restringe a métodos `GET`. Al igual que con vecinos, se extrae el `barrioId` de forma segura de las cabeceras inyectadas por el JWT en el middleware (`x-user-barrio-id`) mediante `getAuthenticatedUser(request)`. Se excluyen explícitamente los reportes solucionados o borrados lógicamente (`activo = false`).
+### 5. Consulta y Listado de Reportes Barriales Activos con Paginación Basada en Cursor (GET /api/incidents/list)
+*   **Contexto:** Se requiere permitir a los usuarios autenticados (de cualquier rol) obtener un listado de reportes barriales activos. Traer todos los registros a la vez degrada el rendimiento de red y UI en el cliente a medida que crece el histórico de incidencias.
+*   **Decisión:** El endpoint se restringe a métodos `GET`. Se extrae el `barrioId` de forma segura de las cabeceras inyectadas por el JWT en el middleware (`x-user-barrio-id`) mediante `getAuthenticatedUser(request)`. Adicionalmente, implementamos paginación basada en cursor (Alternativa B) utilizando la columna `fechaCreacion` del reporte como cursor y un límite predeterminado de 10 elementos por página para asegurar alta velocidad y evitar duplicaciones.
+*   **Implementación:**
+    *   **Backend:** Se extendió `listReportsByBarrio` (en `DrizzleIncidentRepository`) aplicando el operador `lt(reportes.fechaCreacion, cursorDate)` y limitando la consulta. El caso de uso `ListReportsUseCase` calcula el `nextCursor` basado en el último elemento si la cantidad recuperada coincide con el límite.
+    *   **Documentación:** Se actualizó `registry.ts` registrando `nextCursor` en `ListReportsResponseSchema` y exponiendo los parámetros `limit` y `cursor` en la especificación OpenAPI.
 *   **Consecuencias:**
-    *   **Positivas:** Seguridad absoluta por diseño contra IDOR (ningún usuario puede listar reportes de otros barrios). Alta velocidad al procesar filtros en base de datos. Consistencia con la arquitectura hexagonal.
+    *   **Positivas:** Seguridad absoluta por diseño contra IDOR y alta optimización en el payload de datos y renderizado del DOM en dispositivos cliente.
     *   **Negativas:** Obliga a que el usuario posea un `barrioId` asociado en su JWT.
 
 ### 6. Implementación de Apoyos (Likes/Corazones) en Reportes (GET y POST /api/incidents/[id]/supports)

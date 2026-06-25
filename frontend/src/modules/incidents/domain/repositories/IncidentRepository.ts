@@ -10,7 +10,13 @@ export interface IncidentRepository {
     incident: Omit<Incident, 'id' | 'usuarioId' | 'barrioId' | 'estado' | 'fechaCreacion' | 'fechaActualizacion'>
   ): Promise<Incident>;
 
-  getIncidents(apiUrl: string, token: string, status?: string): Promise<Incident[]>;
+  getIncidents(
+    apiUrl: string,
+    token: string,
+    status?: string,
+    limit?: number,
+    cursor?: string
+  ): Promise<{ incidents: Incident[]; nextCursor: string | null }>;
 
   getIncidentSupports(apiUrl: string, token: string, incidentId: number): Promise<SupportStats>;
   toggleIncidentSupport(apiUrl: string, token: string, incidentId: number): Promise<ToggleSupportResult>;

@@ -47,10 +47,22 @@ export class HttpIncidentRepository implements IncidentRepository {
     return json.data as Incident;
   }
 
-  async getIncidents(apiUrl: string, token: string, status?: string): Promise<Incident[]> {
+  async getIncidents(
+    apiUrl: string,
+    token: string,
+    status?: string,
+    limit?: number,
+    cursor?: string
+  ): Promise<{ incidents: Incident[]; nextCursor: string | null }> {
     const url = new URL(`${apiUrl}/api/incidents/list`);
     if (status) {
       url.searchParams.append('status', status);
+    }
+    if (limit) {
+      url.searchParams.append('limit', limit.toString());
+    }
+    if (cursor) {
+      url.searchParams.append('cursor', cursor);
     }
 
     const res = await fetch(url.toString(), {
@@ -67,7 +79,10 @@ export class HttpIncidentRepository implements IncidentRepository {
     }
 
     const json = await res.json();
-    return json.data as Incident[];
+    return {
+      incidents: json.data as Incident[],
+      nextCursor: json.nextCursor as string | null,
+    };
   }
 
   async getIncidentSupports(apiUrl: string, token: string, incidentId: number): Promise<SupportStats> {

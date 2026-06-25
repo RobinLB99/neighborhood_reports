@@ -1,4 +1,4 @@
-import { eq, and, inArray, desc } from "drizzle-orm";
+import { eq, and, inArray, desc, lt } from "drizzle-orm";
 import { db } from "../../../shared-kernel/database/drizzle.js";
 import { Reporte, type ReportStatus } from "../../domain/entities/Reporte.js";
 import type { IncidentRepository } from "../../domain/repositories/IncidentRepository.interface.js";
@@ -64,12 +64,21 @@ export class DrizzleIncidentRepository implements IncidentRepository {
    * @returns Listado de entidades de dominio Reporte.
    * @throws Error si ocurre un fallo al consultar en la persistencia.
    */
-  async listReportsByBarrio(barrioId: number, estado?: string): Promise<Reporte[]> {
+  async listReportsByBarrio(
+    barrioId: number,
+    estado?: string,
+    limit?: number,
+    cursor?: string
+  ): Promise<Reporte[]> {
     try {
       const statusFilter =
         estado && estado !== "todos" && estado !== "all"
           ? eq(reportes.estado, estado)
           : inArray(reportes.estado, ["pendiente", "en_gestion", "solucionado"]);
+
+      const cursorFilter = cursor
+        ? lt(reportes.fechaCreacion, new Date(cursor))
+        : undefined;
 
       const records = await db
         .select()
@@ -78,10 +87,12 @@ export class DrizzleIncidentRepository implements IncidentRepository {
           and(
             eq(reportes.barrioId, barrioId),
             statusFilter,
-            eq(reportes.activo, true)
+            eq(reportes.activo, true),
+            cursorFilter
           )
         )
-        .orderBy(desc(reportes.fechaCreacion));
+        .orderBy(desc(reportes.fechaCreacion))
+        .limit(limit || 10);
 
       return records.map(
         (row) =>

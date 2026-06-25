@@ -16,13 +16,15 @@ export interface IncidentRepository {
   createReport(report: Reporte): Promise<Reporte>;
 
   /**
-   * Obtiene la lista de reportes de un barrio, opcionalmente filtrados por estado.
+   * Obtiene la lista de reportes de un barrio, opcionalmente filtrados por estado y paginados por cursor.
    * 
    * @param barrioId ID del barrio de donde se desean consultar los reportes.
    * @param estado Estado opcional por el cual filtrar los reportes.
+   * @param limit Límite opcional de registros a retornar (por defecto 10).
+   * @param cursor Cursor opcional (fecha ISO string) de inicio para la paginación.
    * @returns Listado de entidades de dominio Reporte.
    */
-  listReportsByBarrio(barrioId: number, estado?: string): Promise<Reporte[]>;
+  listReportsByBarrio(barrioId: number, estado?: string, limit?: number, cursor?: string): Promise<Reporte[]>;
 
   /**
    * Busca un reporte por su ID.
