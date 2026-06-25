@@ -81,7 +81,18 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Persistencia de Cabeceras y Filtros:** Se reestructuró el componente `IncidentsFeed.tsx` para renderizar el header y los filtros en el nivel superior de su flujo, logrando que siempre permanezcan visibles e interactivos mientras se cargan los datos.
         *   **Visualización sin Tarjeta (Cardless):** Se removió la envoltura de tarjeta (`border-hairline`, `bg-chalk`) de los estados de carga (loading), vacío (no hay incidencias) y error. Ahora estos estados transicionales se integran limpiamente en el lienzo de la página.
         *   **Limpieza de Bordes:** Se removió el borde circular Hairline del icono circular del estado vacío para un diseño más limpio y minimalista.
+12. **Refactorización del Header y Menú Desplegable del Usuario [2026-06-25]:**
+    *   *Impacto técnico:*
+        *   **Centralización del Perfil:** Se eliminaron las tarjetas estáticas redundantes del cuerpo del Dashboard. Toda la información del usuario (usuario, rol, barrio) y el botón de "Cerrar sesión" se trasladaron a un menú desplegable interactivo.
+        *   **Interactividad y Click-Outside:** Se diseñó el menú utilizando el sistema brutalista monocromático (`bg-chalk`, `border-hairline`, `shadow-subtle-2`, `rounded-xl`) y se implementó lógica nativa click-outside con un listener de `mousedown` para una experiencia mobile-first óptima.
+        *   **Avatar y Truncamiento:** Se incorporó un avatar genérico (SVG) y se configuró un truncamiento dinámico en el nombre del usuario para evitar desbordes en resoluciones móviles.
+13. **Cabecera Sticky y Botón "Volver Arriba" (Scroll to Top) [2026-06-25]:**
+    *   *Impacto técnico:*
+        *   **Header Fijo (Sticky):** Se modificó la cabecera a `sticky top-0 z-50`. Al permanecer en el flujo normal de la página, evita colisiones de renderizado y elipsis artificiales de padding-top en el elemento principal.
+        *   **Contenedor FAB Agrupado:** Se envolvieron las acciones flotantes en un contenedor flexible (`fixed flex flex-col gap-4 bottom-6 right-6 md:bottom-8 md:right-8 z-50`), logrando una alineación nativa sin solapamientos.
+        *   **Desplazamiento Suave (Scroll to Top):** Se implementó el botón condicional de scroll, el cual escucha de forma óptima el scroll de la ventana (se muestra al pasar los `300px` mediante transiciones de Tailwind) y ejecuta un desplazamiento fluido con `window.scrollTo`.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
 2.  **Validación de Estados de Foco y Contraste:** Asegurar que los componentes interactivos utilicen indicadores de enfoque altamente visibles que cumplan con la relación de contraste **3:1** (WCAG 1.4.11) sobre fondo blanco.
+3.  **Modularización del Dashboard:** Evaluar la extracción del menú desplegable de usuario (`UserDropdown`) y el contenedor de botones flotantes (`FloatingActions`) a componentes Preact independientes para mantener `Dashboard.tsx` conciso y mantenible.

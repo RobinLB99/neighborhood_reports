@@ -28,6 +28,22 @@ export default function Dashboard({ apiUrl }: Props) {
     };
   }, [isMenuOpen]);
 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    function handleScroll() {
+      setShowScrollTop(window.scrollY > 300);
+    }
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <div class="min-h-screen bg-chalk flex items-center justify-center">
@@ -40,7 +56,7 @@ export default function Dashboard({ apiUrl }: Props) {
 
   return (
     <div class="min-h-screen bg-chalk">
-      <header class="border-b border-hairline bg-chalk relative z-50">
+      <header class="sticky top-0 border-b border-hairline bg-chalk z-50">
         <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <span class="text-sm font-semibold text-graphite">Reportes Barriales</span>
@@ -125,15 +141,29 @@ export default function Dashboard({ apiUrl }: Props) {
       </main>
 
       {user.barrioId && (
-        <a
-          href="/dashboard/reportar"
-          class="fixed bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 bg-graphite text-chalk rounded-full flex items-center justify-center shadow-lg hover:bg-carbon hover:-translate-y-1 hover:shadow-xl transition-all duration-300 z-50 group"
-          aria-label="Reportar nueva incidencia"
-        >
-          <svg class="w-6 h-6 transition-transform group-hover:rotate-90 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-        </a>
+        <div class="fixed bottom-6 right-6 md:bottom-8 md:right-8 flex flex-col gap-4 z-50">
+          <button
+            onClick={scrollToTop}
+            class={`w-12 h-12 self-end bg-chalk border border-hairline text-graphite rounded-full flex items-center justify-center shadow-md hover:bg-mist transition-all duration-300 ${
+              showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+            }`}
+            aria-label="Volver arriba"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </button>
+
+          <a
+            href="/dashboard/reportar"
+            class="w-14 h-14 bg-graphite text-chalk rounded-full flex items-center justify-center shadow-lg hover:bg-carbon hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
+            aria-label="Reportar nueva incidencia"
+          >
+            <svg class="w-6 h-6 transition-transform group-hover:rotate-90 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </a>
+        </div>
       )}
     </div>
   );
