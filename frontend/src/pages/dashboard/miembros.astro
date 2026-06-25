@@ -6,5 +6,5 @@ const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 ---
 
 <Layout title="Miembros del Comité — Reportes Barriales">
-  <CommitteeManager client:load apiUrl={apiUrl} />
+  <CommitteeManager client:only="preact" apiUrl={apiUrl} />
 </Layout>

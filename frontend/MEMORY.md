@@ -91,6 +91,12 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Header Fijo (Sticky):** Se modificó la cabecera a `sticky top-0 z-50`. Al permanecer en el flujo normal de la página, evita colisiones de renderizado y elipsis artificiales de padding-top en el elemento principal.
         *   **Contenedor FAB Agrupado:** Se envolvieron las acciones flotantes en un contenedor flexible (`fixed flex flex-col gap-4 bottom-6 right-6 md:bottom-8 md:right-8 z-50`), logrando una alineación nativa sin solapamientos.
         *   **Desplazamiento Suave (Scroll to Top):** Se implementó el botón condicional de scroll, el cual escucha de forma óptima el scroll de la ventana (se muestra al pasar los `300px` mediante transiciones de Tailwind) y ejecuta un desplazamiento fluido con `window.scrollTo`.
+14. **Barra de Progreso Global y View Transitions (Navegación SPA) [2026-06-25]:**
+    *   *Impacto técnico:*
+        *   **ClientRouter de Astro:** Se incorporó el `<ClientRouter />` en el `<head>` de `Layout.astro` para cambiar la navegación MPA tradicional por transiciones de página dinámicas estilo SPA.
+        *   **Integración de nprogress:** Se instaló y configuró la barra de progreso `nprogress` en un script global de Astro, enlazada a los eventos `astro:before-preparation` (inicio) y `astro:page-load` (cierre).
+        *   **Estilos Monocromáticos:** Se diseñaron las reglas CSS de `#nprogress` en `global.css` para forzar una barra de 3px de color `var(--color-graphite)` (#0a0a0a) con una sombra difuminada del mismo color y ocultando el cargador circular predeterminado para mantener la sobriedad visual brutalista.
+        *   **Optimización de Cargas y Caché:** Se refactorizó `useAuth.ts` para retornar inmediatamente `loading: false` si existe caché del usuario en `localStorage`. Para evitar errores de **hydration mismatch** al reconciliar el DOM virtual del cliente con el HTML del spinner del servidor, se actualizaron las rutas privadas `/dashboard` y `/dashboard/miembros` a `client:only="preact"`. Esto elimina por completo el parpadeo de carga global entre páginas y previene fallos en la cuadrícula de maquetación del navegador.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.

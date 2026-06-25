@@ -14,8 +14,30 @@ interface UseAuthOptions {
 }
 
 export default function useAuth({ apiUrl, requireAuth = false }: UseAuthOptions) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('auth_user');
+      if (cached) {
+        try {
+          return JSON.parse(cached);
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      const cached = localStorage.getItem('auth_user');
+      if (token && cached) {
+        return false; // No bloquear la interfaz si ya hay token y caché
+      }
+    }
+    return true;
+  });
   const [error, setError] = useState<string | null>(null);
 
   function logout() {
@@ -34,16 +56,6 @@ export default function useAuth({ apiUrl, requireAuth = false }: UseAuthOptions)
         window.location.href = '/login';
       }
       return;
-    }
-
-    // Inicializar con usuario en cache para evitar parpadeos visuales innecesarios
-    const cachedUser = localStorage.getItem('auth_user');
-    if (cachedUser) {
-      try {
-        setUser(JSON.parse(cachedUser));
-      } catch {
-        // Ignorar errores de parseo
-      }
     }
 
     fetch(`${apiUrl}/api/auth/me`, {
