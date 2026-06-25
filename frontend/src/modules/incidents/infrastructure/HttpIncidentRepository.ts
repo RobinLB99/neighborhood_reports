@@ -1,6 +1,16 @@
 import type { IncidentRepository } from '../domain/repositories/IncidentRepository';
 import type { Incident } from '../domain/entities/Incident';
 import type { SupportStats, ToggleSupportResult } from '../domain/entities/SupportStats';
+import type { Comment } from '../domain/entities/Comment';
+import { z } from 'zod';
+
+const commentResponseSchema = z.object({
+  id: z.number(),
+  reporteId: z.number(),
+  usuarioId: z.number(),
+  mensaje: z.string(),
+  fechaCreacion: z.string().optional(),
+});
 
 export class HttpIncidentRepository implements IncidentRepository {
   async createIncident(
@@ -78,6 +88,55 @@ export class HttpIncidentRepository implements IncidentRepository {
 
     const json = await res.json();
     return json.data as ToggleSupportResult;
+  }
+
+  async addComment(apiUrl: string, token: string, incidentId: number, message: string): Promise<Comment> {
+    const res = await fetch(`${apiUrl}/api/incidents/${incidentId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ mensaje: message }),
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || 'Error al agregar el comentario.');
+    }
+
+    const json = await res.json();
+    
+    // Validamos la respuesta utilizando Zod según las reglas
+    const parsed = commentResponseSchema.safeParse(json.data);
+    if (!parsed.success) {
+      throw new Error('La respuesta del servidor no tiene el formato esperado.');
+    }
+
+    return parsed.data;
+  }
+
+  async getComments(apiUrl: string, token: string, incidentId: number): Promise<Comment[]> {
+    const res = await fetch(`${apiUrl}/api/incidents/${incidentId}/comments`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || 'Error al obtener los comentarios del reporte.');
+    }
+
+    const json = await res.json();
+    const parsed = z.array(commentResponseSchema).safeParse(json.data);
+    if (!parsed.success) {
+      throw new Error('La respuesta del servidor no tiene el formato esperado.');
+    }
+
+    return parsed.data;
   }
 }
 

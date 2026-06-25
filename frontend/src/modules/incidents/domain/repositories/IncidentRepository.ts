@@ -1,5 +1,6 @@
 import type { Incident } from '../entities/Incident';
 import type { SupportStats, ToggleSupportResult } from '../entities/SupportStats';
+import type { Comment } from '../entities/Comment';
 
 export interface IncidentRepository {
   createIncident(
@@ -12,5 +13,8 @@ export interface IncidentRepository {
 
   getIncidentSupports(apiUrl: string, token: string, incidentId: number): Promise<SupportStats>;
   toggleIncidentSupport(apiUrl: string, token: string, incidentId: number): Promise<ToggleSupportResult>;
+
+  addComment(apiUrl: string, token: string, incidentId: number, message: string): Promise<Comment>;
+  getComments(apiUrl: string, token: string, incidentId: number): Promise<Comment[]>;
 }
 

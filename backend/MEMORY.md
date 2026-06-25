@@ -6,7 +6,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 📅 Estado y Contexto General
 *   **Fecha de Creación:** 20 de Junio, 2026
-*   **Última Actualización:** 24 de Junio, 2026 (por Jarvis - Senior Software Architect)
+*   **Última Actualización:** 24 de Junio, 2026 (por Jarvis - Gestión y Recuperación de Comentarios en Reportes)
 *   **Entorno Principal:** Node.js (Vercel Serverless Functions) con TypeScript
 *   **Arquitectura:** Concentrada en capas concéntricas (Dominio, Aplicación, Infraestructura) siguiendo Hexagonal, Clean y Screaming Architecture (detallado en [architecture.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/architecture.md)).
 
@@ -118,6 +118,21 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Reducción de la latencia y volumen de empaquetado para funciones serverless en Vercel al consolidar la lógica de apoyos en un único handler dinámico. Desacoplamiento de negocio en puertos/casos de uso separados (`ToggleIncidentSupportUseCase` y `GetIncidentSupportsUseCase`).
     *   **Negativas:** Ninguna.
 
+### 7. Implementación de Gestión de Comentarios en Reportes (POST y GET /api/incidents/[id]/comments)
+*   **Contexto:** Los usuarios requieren poder dejar comentarios en los reportes ciudadanos para aportar detalles o coordinar acciones, y los líderes y miembros del comité necesitan poder listar estos comentarios para el seguimiento.
+*   **Decisión:** Crear y extender la lógica estructurada en base a Clean Architecture:
+    *   **Dominio:** Entidad `Comentario` con validaciones puras y un esquema Zod (`CreateCommentPayloadSchema`) que limita el mensaje a un máximo de 500 caracteres.
+    *   **Puerto:** Interfaz `IncidentCommentRepository` definiendo `addComment` y `getCommentsByReporte`.
+    *   **Aplicación:**
+        *   `AddCommentToIncidentUseCase` que comprueba si la incidencia existe (vía `IncidentRepository`) antes de delegar la persistencia del comentario (`POST`).
+        *   `GetIncidentCommentsUseCase` que valida la existencia del reporte y recupera su listado de comentarios activos (`GET`).
+    *   **Infraestructura:** Adaptador `DrizzleIncidentCommentRepository` mapeando las operaciones a la tabla preexistente `comentarios` mediante Drizzle ORM.
+    *   **Adaptador Primario (Vercel Handler):** Handler dinámico en `/api/incidents/[id]/comments.ts` extendido para soportar `POST` y `GET`. En el flujo `GET`, se extrae el token del JWT y se restringe el acceso retornando `403 Forbidden` a cualquier usuario que no posea los roles `lider` o `miembro`.
+    *   **Contrato e Integración OpenAPI:** Registro explícito en `registry.ts` de los esquemas (`CreateCommentResponseSchema`, `ListCommentsResponseSchema`) y de los endpoints `POST` y `GET` bajo `/api/incidents/{id}/comments` con autorización Bearer JWT. Esto actualiza de manera automatizada el contrato `openapi.json` para el frontend.
+*   **Consecuencias:**
+    *   **Positivas:** Seguridad por diseño (evita suplantación de `usuario_id` y limita la visibilidad a roles autorizados mediante checks de roles en el handler). Encapsulamiento del dominio con límites claros. Contratos OpenAPI sincronizados y documentados en código.
+    *   **Negativas:** Ninguna.
+
 ---
 
 ## 🐳 Decisiones de Infraestructura y Contenedores
@@ -166,4 +181,5 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 - [x] Refactorizar la base de datos y esquema de incidentes para utilizar restricciones SQL `CHECK` en el campo `estado` (VARCHAR).
 - [x] Diseñar e implementar el flujo de subidas firmadas a Cloudinary e insertar reportes ciudadanos (`POST /api/incidents/create`).
 - [x] Implementar la consulta y listado de reportes barriales activos (`GET /api/incidents/list`).
+- [x] Diseñar e implementar el endpoint de comentarios en reportes (`POST` y `GET /api/incidents/[id]/comments`).
 - [ ] Continuar estructurando las capas concéntricas de los dominios (`worker-profile`, `identity-validation`, etc.).

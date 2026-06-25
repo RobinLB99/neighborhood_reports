@@ -977,6 +977,141 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/incidents/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener comentarios de un reporte
+         * @description Recupera la lista de comentarios de un reporte de incidencia específico. Solo accesible para líderes y miembros.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Listado de comentarios recuperado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListCommentsResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros pueden acceder. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Registrar comentario en reporte
+         * @description Registra un comentario en el reporte especificado por ID para el usuario autenticado.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        mensaje: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Comentario registrado con éxito. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateCommentResponse"];
+                    };
+                };
+                /** @description Payload o ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1123,6 +1258,26 @@ export interface components {
                 count: number;
                 hasSupported: boolean;
             };
+        };
+        CreateCommentResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                usuarioId: number;
+                mensaje: string;
+                fechaCreacion?: string;
+            };
+        };
+        ListCommentsResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                usuarioId: number;
+                mensaje: string;
+                fechaCreacion?: string;
+            }[];
         };
     };
     responses: never;

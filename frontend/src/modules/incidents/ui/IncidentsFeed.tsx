@@ -3,18 +3,30 @@ import { GetActiveIncidentsUseCase } from '../application/use-cases/GetActiveInc
 import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
 import type { Incident } from '../domain/entities/Incident';
 import IncidentSupportButton from './IncidentSupportButton';
+import IncidentCommentForm from './IncidentCommentForm';
+import IncidentCommentsModal from './IncidentCommentsModal';
 
 
 interface Props {
   apiUrl: string;
   token: string;
+  userRole?: string;
 }
 
-export default function IncidentsFeed({ apiUrl, token }: Props) {
+export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [activeCommentIncidentIds, setActiveCommentIncidentIds] = useState<Record<number, boolean>>({});
+  const [viewCommentsIncidentId, setViewCommentsIncidentId] = useState<number | null>(null);
+
+  const toggleCommentForm = (incidentId: number) => {
+    setActiveCommentIncidentIds((prev) => ({
+      ...prev,
+      [incidentId]: !prev[incidentId],
+    }));
+  };
 
   const fetchIncidents = () => {
     setLoading(true);
@@ -173,22 +185,61 @@ export default function IncidentsFeed({ apiUrl, token }: Props) {
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
                   <IncidentSupportButton apiUrl={apiUrl} token={token} incidentId={incident.id} />
+                  
+                  <button
+                    onClick={() => toggleCommentForm(incident.id)}
+                    class={`shrink-0 inline-flex items-center justify-center gap-0 sm:gap-1.5 text-xs font-semibold border rounded-lg w-11 sm:w-auto px-0 sm:px-4 h-11 transition-colors cursor-pointer min-h-[44px] select-none ${
+                      activeCommentIncidentIds[incident.id]
+                        ? 'bg-graphite text-chalk border-graphite hover:bg-carbon hover:border-carbon'
+                        : 'bg-chalk text-graphite border-hairline hover:bg-mist'
+                    }`}
+                    aria-label="Comentar este reporte"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <span class="hidden sm:inline">Comentar</span>
+                  </button>
+
+                  {(userRole === 'lider' || userRole === 'miembro') && (
+                    <button
+                      onClick={() => setViewCommentsIncidentId(incident.id)}
+                      class="shrink-0 inline-flex items-center justify-center gap-0 sm:gap-1.5 text-xs font-semibold bg-chalk text-graphite border border-hairline rounded-lg w-11 sm:w-auto px-0 sm:px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] select-none"
+                      aria-label="Ver comentarios de este reporte"
+                    >
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span class="hidden sm:inline">Ver Comentarios</span>
+                    </button>
+                  )}
+
                   {incident.ubicacion && (
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${incident.ubicacion}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="shrink-0 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-graphite border border-hairline rounded-lg px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] flex-1 sm:flex-initial"
+                      class="shrink-0 inline-flex items-center justify-center gap-0 sm:gap-1.5 text-xs font-medium text-graphite border border-hairline rounded-lg w-11 sm:w-auto px-0 sm:px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] flex-initial"
                     >
                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                       </svg>
-                      Ver en Google Maps
+                      <span class="hidden sm:inline">Ver en Google Maps</span>
                     </a>
                   )}
                 </div>
 
               </div>
+
+              {activeCommentIncidentIds[incident.id] && (
+                <IncidentCommentForm
+                  apiUrl={apiUrl}
+                  token={token}
+                  incidentId={incident.id}
+                  onSuccess={() => toggleCommentForm(incident.id)}
+                />
+              )}
             </article>
           ))}
         </div>
@@ -225,6 +276,16 @@ export default function IncidentsFeed({ apiUrl, token }: Props) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de comentarios */}
+      {viewCommentsIncidentId !== null && (
+        <IncidentCommentsModal
+          apiUrl={apiUrl}
+          token={token}
+          incidentId={viewCommentsIncidentId}
+          onClose={() => setViewCommentsIncidentId(null)}
+        />
       )}
     </div>
   );

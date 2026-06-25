@@ -11,6 +11,7 @@ import { NeighborsResponseSchema } from "../../authentication/application/dtos/G
 import { CommitteeMembersListResponseSchema } from "../../committee/application/dtos/GetCommitteeMembersDto.js";
 import { CreateReportPayloadSchema } from "../../incidents/domain/entities/Reporte.js";
 import { IncidentSupportParamsSchema, SupportStatsResponseSchema } from "../../incidents/domain/entities/Apoyo.js";
+import { AddCommentParamsSchema, CreateCommentPayloadSchema } from "../../incidents/domain/entities/Comentario.js";
 
 
 export const registry = new OpenAPIRegistry();
@@ -583,6 +584,24 @@ const SupportStatsResponseSchemaRegistered = registry.register(
   SupportStatsResponseSchema
 );
 
+const CommentItemSchema = z.object({
+  id: z.number(),
+  reporteId: z.number(),
+  usuarioId: z.number(),
+  mensaje: z.string(),
+  fechaCreacion: z.string().optional(),
+});
+
+const CreateCommentResponseSchema = registry.register("CreateCommentResponse", z.object({
+  message: z.string(),
+  data: CommentItemSchema,
+}));
+
+const ListCommentsResponseSchema = registry.register("ListCommentsResponse", z.object({
+  message: z.string(),
+  data: z.array(CommentItemSchema),
+}));
+
 // Registrar rutas de apoyos
 registry.registerPath({
   method: "post",
@@ -640,6 +659,82 @@ registry.registerPath({
     },
     401: {
       description: "No autorizado o token JWT inválido.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/{id}/comments",
+  summary: "Registrar comentario en reporte",
+  description: "Registra un comentario en el reporte especificado por ID para el usuario autenticado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: AddCommentParamsSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: CreateCommentPayloadSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Comentario registrado con éxito.",
+      content: {
+        "application/json": {
+          schema: CreateCommentResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Payload o ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/{id}/comments",
+  summary: "Obtener comentarios de un reporte",
+  description: "Recupera la lista de comentarios de un reporte de incidencia específico. Solo accesible para líderes y miembros.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: AddCommentParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Listado de comentarios recuperado con éxito.",
+      content: {
+        "application/json": {
+          schema: ListCommentsResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros pueden acceder.",
     },
     404: {
       description: "Reporte no encontrado en el sistema.",

@@ -73,7 +73,7 @@ export default function IncidentSupportButton({ apiUrl, token, incidentId }: Pro
     <button
       onClick={handleToggle}
       disabled={toggling}
-      class={`shrink-0 inline-flex items-center justify-center gap-1.5 text-xs font-semibold border rounded-lg px-4 h-11 transition-colors cursor-pointer min-h-[44px] select-none ${
+      class={`shrink-0 inline-flex items-center justify-center gap-1.5 text-xs font-semibold border rounded-lg px-3 sm:px-4 h-11 transition-colors cursor-pointer min-h-[44px] select-none ${
         hasSupported
           ? 'bg-graphite text-chalk border-graphite hover:bg-carbon hover:border-carbon'
           : 'bg-chalk text-graphite border-hairline hover:bg-mist'
