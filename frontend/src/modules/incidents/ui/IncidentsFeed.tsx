@@ -6,15 +6,17 @@ import IncidentSupportButton from './IncidentSupportButton';
 import IncidentCommentForm from './IncidentCommentForm';
 import IncidentCommentsModal from './IncidentCommentsModal';
 import DirectiveManagementModal from './DirectiveManagementModal';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 
 interface Props {
   apiUrl: string;
   token: string;
   userRole?: string;
+  currentUserId?: number;
 }
 
-export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
+export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }: Props) {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +24,12 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
   const [activeCommentIncidentIds, setActiveCommentIncidentIds] = useState<Record<number, boolean>>({});
   const [viewCommentsIncidentId, setViewCommentsIncidentId] = useState<number | null>(null);
   const [selectedDirectiveIncidentId, setSelectedDirectiveIncidentId] = useState<number | null>(null);
+  
+  // Estados para eliminación lógica
+  const [deleteIncidentId, setDeleteIncidentId] = useState<number | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
 
   const toggleCommentForm = (incidentId: number) => {
     setActiveCommentIncidentIds((prev) => ({
@@ -47,6 +55,31 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
         setLoading(false);
       });
   };
+
+  const handleDeleteIncident = async () => {
+    if (!deleteIncidentId) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`${apiUrl}/api/incidents/${deleteIncidentId}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || 'Error al intentar eliminar el reporte.');
+      }
+      setIncidents((prev) => prev.filter((inc) => inc.id !== deleteIncidentId));
+      setDeleteIncidentId(null);
+    } catch (err: any) {
+      setDeleteError(err.message || 'Hubo un error de red al intentar eliminar el reporte.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     fetchIncidents();
@@ -137,10 +170,28 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
                     {incident.estado === 'pendiente' ? 'Pendiente' : 'En Gestión'}
                   </span>
                 </div>
-                <div class="flex items-center gap-1.5 text-xs text-concrete font-mono">
-                  <span>#{incident.id}</span>
-                  <span class="text-hairline">•</span>
-                  <span>{formatDate(incident.fechaCreacion)}</span>
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-1.5 text-xs text-concrete font-mono">
+                    <span>#{incident.id}</span>
+                    <span class="text-hairline">•</span>
+                    <span>{formatDate(incident.fechaCreacion)}</span>
+                  </div>
+                  {((userRole === 'lider' || userRole === 'miembro') || 
+                    (userRole === 'ciudadano' && incident.usuarioId === currentUserId)) && (
+                    <button
+                      onClick={() => {
+                        setDeleteError(null);
+                        setDeleteIncidentId(incident.id);
+                      }}
+                      class="shrink-0 flex items-center justify-center text-concrete hover:text-rose-500 hover:bg-rose-50/50 border border-hairline hover:border-rose-200 rounded-lg w-8 h-8 transition-colors cursor-pointer select-none"
+                      aria-label="Eliminar este reporte"
+                      title="Eliminar reporte"
+                    >
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -230,6 +281,7 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
                     </>
                   )}
 
+
                   {incident.ubicacion && (
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${incident.ubicacion}`}
@@ -313,6 +365,17 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
           onSuccess={() => {
             fetchIncidents();
           }}
+        />
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {deleteIncidentId !== null && (
+        <ConfirmDeleteModal
+          incidentId={deleteIncidentId}
+          loading={deleteLoading}
+          error={deleteError}
+          onClose={() => setDeleteIncidentId(null)}
+          onConfirm={handleDeleteIncident}
         />
       )}
     </div>

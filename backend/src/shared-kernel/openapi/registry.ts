@@ -853,6 +853,47 @@ registry.registerPath({
   },
 });
 
+const DeleteIncidentResponseSchema = registry.register("DeleteIncidentResponse", z.object({
+  message: z.string(),
+}));
+
+registry.registerPath({
+  method: "delete",
+  path: "/api/incidents/{id}/delete",
+  summary: "Eliminación lógica de un reporte",
+  description: "Realiza el borrado lógico de un reporte de incidencia. Los líderes y miembros pueden eliminar cualquier reporte. Los ciudadanos solo pueden eliminar sus propios reportes.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: CreateGestionParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Reporte eliminado exitosamente.",
+      content: {
+        "application/json": {
+          schema: DeleteIncidentResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. El usuario no posee permisos para eliminar este reporte.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema o ya inactivo.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+
 
 
 

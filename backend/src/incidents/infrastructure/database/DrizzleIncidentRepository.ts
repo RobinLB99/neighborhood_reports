@@ -136,4 +136,25 @@ export class DrizzleIncidentRepository implements IncidentRepository {
       throw new Error(`[Database Infrastructure Error]: ${error.message || "Fallo de consulta por ID desconocido."}`);
     }
   }
+
+  /**
+   * Realiza la eliminación lógica de un reporte actualizando el campo 'activo' a false.
+   * 
+   * @param id ID del reporte a eliminar lógicamente.
+   */
+  async softDelete(id: number): Promise<void> {
+    try {
+      await db
+        .update(reportes)
+        .set({
+          activo: false,
+          fechaActualizacion: new Date(),
+        })
+        .where(eq(reportes.id, id));
+    } catch (error: any) {
+      console.error("[Database Error] Error al realizar borrado lógico de reporte:", error);
+      throw new Error(`[Database Infrastructure Error]: ${error.message || "Fallo al ejecutar eliminación lógica."}`);
+    }
+  }
 }
+

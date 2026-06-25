@@ -1256,6 +1256,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/incidents/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Eliminación lógica de un reporte
+         * @description Realiza el borrado lógico de un reporte de incidencia. Los líderes y miembros pueden eliminar cualquier reporte. Los ciudadanos solo pueden eliminar sus propios reportes.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Reporte eliminado exitosamente. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeleteIncidentResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. El usuario no posee permisos para eliminar este reporte. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema o ya inactivo. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1445,6 +1521,9 @@ export interface components {
                 mensaje: string;
                 fechaGestion?: string;
             }[];
+        };
+        DeleteIncidentResponse: {
+            message: string;
         };
     };
     responses: never;

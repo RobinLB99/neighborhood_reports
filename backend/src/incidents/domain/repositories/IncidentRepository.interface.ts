@@ -30,4 +30,12 @@ export interface IncidentRepository {
    * @returns La entidad de dominio Reporte o null si no se encuentra.
    */
   findById(id: number): Promise<Reporte | null>;
+
+  /**
+   * Realiza la eliminación lógica de un reporte.
+   * 
+   * @param id ID del reporte a eliminar.
+   */
+  softDelete(id: number): Promise<void>;
 }
+

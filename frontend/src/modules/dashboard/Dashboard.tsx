@@ -84,7 +84,7 @@ export default function Dashboard({ apiUrl }: Props) {
         )}
 
         {user.barrioId && (
-          <IncidentsFeed apiUrl={apiUrl} token={token} userRole={user.rol} />
+          <IncidentsFeed apiUrl={apiUrl} token={token} userRole={user.rol} currentUserId={user.id} />
         )}
       </main>
 

@@ -71,8 +71,12 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Capa Aplicación:** Creación de `CreateIncidentGestionUseCase` que realiza validaciones síncronas preliminares y delega la llamada.
         *   **Capa Infraestructura:** Implementación del método `createGestion` en `HttpIncidentRepository` realizando un `POST` a `/api/incidents/{id}/management`, controlando errores y validando el resultado mediante el esquema Zod `gestionResponseSchema`.
         *   **Capa UI:** Refactorización de `DirectiveManagementModal.tsx` eliminando la llamada directa a `fetch` e instanciando/consumiendo el caso de uso `CreateIncidentGestionUseCase`.
+10. **Eliminación Lógica de Reportes e Incidencias (Borrado Suave) [2026-06-25]:**
+    *   *Impacto técnico:*
+        *   **Backend:** Se añadió el método `softDelete` al repositorio de incidencias y se implementó `DeleteIncidentUseCase`. Se expuso el endpoint `DELETE /api/incidents/[id]/delete` aplicando reglas de autorización estrictas (Líder/Miembro acceden a todo; Ciudadano solo a sus propios reportes).
+        *   **Contratos:** Se actualizaron los contratos OpenAPI en `openapi.json` y se sincronizó el tipado del frontend en `src/shared/types/api.ts`.
+        *   **Frontend UI:** Se colocó el botón de eliminación en el header superior derecho de las tarjetas de reportes en `IncidentsFeed.tsx`, mostrando solo el ícono con un hover sutil (`w-8 h-8`, `hover:text-rose-500 hover:bg-rose-50/50`). Se integró el componente `ConfirmDeleteModal.tsx` para confirmar la acción de eliminación lógica en la base de datos de manera interactiva.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
 2.  **Validación de Estados de Foco y Contraste:** Asegurar que los componentes interactivos utilicen indicadores de enfoque altamente visibles que cumplan con la relación de contraste **3:1** (WCAG 1.4.11) sobre fondo blanco.
-

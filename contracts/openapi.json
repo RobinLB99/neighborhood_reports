@@ -742,6 +742,17 @@
           "message",
           "data"
         ]
+      },
+      "DeleteIncidentResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
       }
     },
     "parameters": {}
@@ -1659,6 +1670,56 @@
           },
           "404": {
             "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/{id}/delete": {
+      "delete": {
+        "summary": "Eliminación lógica de un reporte",
+        "description": "Realiza el borrado lógico de un reporte de incidencia. Los líderes y miembros pueden eliminar cualquier reporte. Los ciudadanos solo pueden eliminar sus propios reportes.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reporte eliminado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteIncidentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "403": {
+            "description": "Acceso denegado. El usuario no posee permisos para eliminar este reporte."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema o ya inactivo."
           },
           "500": {
             "description": "Error interno del servidor."
