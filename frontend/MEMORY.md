@@ -1,7 +1,7 @@
 # Memoria de Contexto del Proyecto — Frontend de Reportes de Vecindario
 
 ## Información General
-*   **Fecha de Última Actualización:** 2026-06-24
+*   **Fecha de Última Actualización:** 2026-06-25
 *   **Arquitecto a Cargo:** Jarvis (AI Senior Software Architect)
 
 ## Estado de la Arquitectura
@@ -76,6 +76,11 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Backend:** Se añadió el método `softDelete` al repositorio de incidencias y se implementó `DeleteIncidentUseCase`. Se expuso el endpoint `DELETE /api/incidents/[id]/delete` aplicando reglas de autorización estrictas (Líder/Miembro acceden a todo; Ciudadano solo a sus propios reportes).
         *   **Contratos:** Se actualizaron los contratos OpenAPI en `openapi.json` y se sincronizó el tipado del frontend en `src/shared/types/api.ts`.
         *   **Frontend UI:** Se colocó el botón de eliminación en el header superior derecho de las tarjetas de reportes en `IncidentsFeed.tsx`, mostrando solo el ícono con un hover sutil (`w-8 h-8`, `hover:text-rose-500 hover:bg-rose-50/50`). Se integró el componente `ConfirmDeleteModal.tsx` para confirmar la acción de eliminación lógica en la base de datos de manera interactiva.
+11. **Refactorización de Layout y UX en Mural de Reportes [2026-06-25]:**
+    *   *Impacto técnico:*
+        *   **Persistencia de Cabeceras y Filtros:** Se reestructuró el componente `IncidentsFeed.tsx` para renderizar el header y los filtros en el nivel superior de su flujo, logrando que siempre permanezcan visibles e interactivos mientras se cargan los datos.
+        *   **Visualización sin Tarjeta (Cardless):** Se removió la envoltura de tarjeta (`border-hairline`, `bg-chalk`) de los estados de carga (loading), vacío (no hay incidencias) y error. Ahora estos estados transicionales se integran limpiamente en el lienzo de la página.
+        *   **Limpieza de Bordes:** Se removió el borde circular Hairline del icono circular del estado vacío para un diseño más limpio y minimalista.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.

@@ -104,34 +104,6 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
     }
   };
 
-  if (loading) {
-    return (
-      <div class="py-16 text-center border border-hairline rounded-[14px] bg-chalk mt-10">
-        <div class="inline-block animate-pulse w-6 h-6 border-2 border-concrete border-t-transparent rounded-full mb-3"></div>
-        <p class="text-sm text-concrete font-medium">Cargando mural de reportes...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div class="py-16 px-6 text-center border border-hairline rounded-[14px] bg-chalk mt-10">
-        <div class="w-12 h-12 bg-mist rounded-full flex items-center justify-center mx-auto mb-4 border border-hairline">
-          <svg class="w-6 h-6 text-concrete" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
-        <p class="text-sm text-concrete mb-6 font-medium">{error}</p>
-        <button
-          onClick={fetchIncidents}
-          class="inline-flex items-center justify-center text-xs font-semibold uppercase text-pure-black border border-pure-black rounded-lg px-5 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px]"
-        >
-          Reintentar
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div class="mt-10">
       <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -156,9 +128,29 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
         </div>
       </div>
 
-      {incidents.length === 0 ? (
-        <div class="py-16 text-center border border-hairline rounded-[14px] bg-chalk">
-          <div class="w-12 h-12 bg-mist rounded-full flex items-center justify-center mx-auto mb-4 border border-hairline">
+      {loading ? (
+        <div class="py-16 text-center mt-4">
+          <div class="inline-block animate-pulse w-6 h-6 border-2 border-concrete border-t-transparent rounded-full mb-3"></div>
+          <p class="text-sm text-concrete font-medium">Cargando mural de reportes...</p>
+        </div>
+      ) : error ? (
+        <div class="py-16 px-6 text-center mt-4">
+          <div class="w-12 h-12 bg-mist rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-concrete" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p class="text-sm text-concrete mb-6 font-medium">{error}</p>
+          <button
+            onClick={fetchIncidents}
+            class="inline-flex items-center justify-center text-xs font-semibold uppercase text-pure-black border border-pure-black rounded-lg px-5 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px]"
+          >
+            Reintentar
+          </button>
+        </div>
+      ) : incidents.length === 0 ? (
+        <div class="py-16 text-center">
+          <div class="w-12 h-12 bg-mist rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-6 h-6 text-concrete" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
