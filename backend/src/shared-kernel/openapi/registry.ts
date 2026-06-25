@@ -543,7 +543,7 @@ const IncidentSchema = z.object({
   fechaActualizacion: z.string().optional(),
 });
 
-const ListActiveReportsResponseSchema = registry.register("ListActiveReportsResponse", z.object({
+const ListReportsResponseSchema = registry.register("ListReportsResponse", z.object({
   message: z.string(),
   data: z.array(IncidentSchema),
 }));
@@ -551,15 +551,20 @@ const ListActiveReportsResponseSchema = registry.register("ListActiveReportsResp
 registry.registerPath({
   method: "get",
   path: "/api/incidents/list",
-  summary: "Listar reportes activos del barrio",
-  description: "Recupera los reportes barriales activos ('pendiente' o 'en_gestion') para el barrio del usuario autenticado (cualquier rol).",
+  summary: "Listar reportes del barrio",
+  description: "Recupera los reportes barriales filtrados por estado para el barrio del usuario autenticado (cualquier rol).",
   security: [{ bearerAuth: [] }],
+  request: {
+    query: z.object({
+      status: z.enum(["pendiente", "en_gestion", "solucionado", "all"]).optional().openapi({ description: "Filtrar por estado del reporte" }),
+    }),
+  },
   responses: {
     200: {
-      description: "Listado de reportes activos recuperado con éxito.",
+      description: "Listado de reportes recuperado con éxito.",
       content: {
         "application/json": {
-          schema: ListActiveReportsResponseSchema,
+          schema: ListReportsResponseSchema,
         },
       },
     },

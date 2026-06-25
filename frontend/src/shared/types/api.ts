@@ -810,25 +810,28 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Listar reportes activos del barrio
-         * @description Recupera los reportes barriales activos ('pendiente' o 'en_gestion') para el barrio del usuario autenticado (cualquier rol).
+         * Listar reportes del barrio
+         * @description Recupera los reportes barriales filtrados por estado para el barrio del usuario autenticado (cualquier rol).
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description Filtrar por estado del reporte */
+                    status?: "pendiente" | "en_gestion" | "solucionado" | "all";
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Listado de reportes activos recuperado con éxito. */
+                /** @description Listado de reportes recuperado con éxito. */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ListActiveReportsResponse"];
+                        "application/json": components["schemas"]["ListReportsResponse"];
                     };
                 };
                 /** @description No autorizado o token JWT inválido. */
@@ -1451,7 +1454,7 @@ export interface components {
                 fechaCreacion?: string;
             };
         };
-        ListActiveReportsResponse: {
+        ListReportsResponse: {
             message: string;
             data: {
                 id: number;

@@ -57,21 +57,27 @@ export class DrizzleIncidentRepository implements IncidentRepository {
   }
 
   /**
-   * Obtiene la lista de reportes activos ('pendiente' y 'en_gestion') de un barrio utilizando Drizzle ORM.
+   * Obtiene la lista de reportes de un barrio utilizando Drizzle ORM, opcionalmente filtrados por estado.
    * 
    * @param barrioId ID del barrio de donde se desean consultar los reportes.
+   * @param estado Estado opcional por el cual filtrar (si es 'todos'/'all' o indefinido, trae todos los activos).
    * @returns Listado de entidades de dominio Reporte.
    * @throws Error si ocurre un fallo al consultar en la persistencia.
    */
-  async listActiveReportsByBarrio(barrioId: number): Promise<Reporte[]> {
+  async listReportsByBarrio(barrioId: number, estado?: string): Promise<Reporte[]> {
     try {
+      const statusFilter =
+        estado && estado !== "todos" && estado !== "all"
+          ? eq(reportes.estado, estado)
+          : inArray(reportes.estado, ["pendiente", "en_gestion", "solucionado"]);
+
       const records = await db
         .select()
         .from(reportes)
         .where(
           and(
             eq(reportes.barrioId, barrioId),
-            inArray(reportes.estado, ["pendiente", "en_gestion"]),
+            statusFilter,
             eq(reportes.activo, true)
           )
         )

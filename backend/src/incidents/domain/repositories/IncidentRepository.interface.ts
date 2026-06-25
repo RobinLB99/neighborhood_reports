@@ -16,12 +16,13 @@ export interface IncidentRepository {
   createReport(report: Reporte): Promise<Reporte>;
 
   /**
-   * Obtiene la lista de reportes activos ('pendiente' y 'en_gestion') de un barrio.
+   * Obtiene la lista de reportes de un barrio, opcionalmente filtrados por estado.
    * 
    * @param barrioId ID del barrio de donde se desean consultar los reportes.
+   * @param estado Estado opcional por el cual filtrar los reportes.
    * @returns Listado de entidades de dominio Reporte.
    */
-  listActiveReportsByBarrio(barrioId: number): Promise<Reporte[]>;
+  listReportsByBarrio(barrioId: number, estado?: string): Promise<Reporte[]>;
 
   /**
    * Busca un reporte por su ID.

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { GetActiveIncidentsUseCase } from '../application/use-cases/GetActiveIncidentsUseCase';
+import { GetIncidentsUseCase } from '../application/use-cases/GetIncidentsUseCase';
 import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
 import type { Incident } from '../domain/entities/Incident';
 import IncidentSupportButton from './IncidentSupportButton';
@@ -24,6 +24,7 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
   const [activeCommentIncidentIds, setActiveCommentIncidentIds] = useState<Record<number, boolean>>({});
   const [viewCommentsIncidentId, setViewCommentsIncidentId] = useState<number | null>(null);
   const [selectedDirectiveIncidentId, setSelectedDirectiveIncidentId] = useState<number | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   
   // Estados para eliminación lógica
   const [deleteIncidentId, setDeleteIncidentId] = useState<number | null>(null);
@@ -41,15 +42,17 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
   const fetchIncidents = () => {
     setLoading(true);
     const repository = new HttpIncidentRepository();
-    const useCase = new GetActiveIncidentsUseCase(repository);
+    const useCase = new GetIncidentsUseCase(repository);
 
-    useCase.execute(apiUrl, token)
+    const apiFilter = statusFilter === 'all' ? undefined : statusFilter;
+
+    useCase.execute(apiUrl, token, apiFilter)
       .then((data) => {
         setIncidents(data);
         setError(null);
       })
       .catch((err) => {
-        setError(err.message || 'Error al cargar los reportes activos.');
+        setError(err.message || 'Error al cargar los reportes.');
       })
       .finally(() => {
         setLoading(false);
@@ -83,7 +86,7 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
 
   useEffect(() => {
     fetchIncidents();
-  }, [apiUrl, token]);
+  }, [apiUrl, token, statusFilter]);
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return 'N/A';
@@ -131,14 +134,26 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
 
   return (
     <div class="mt-10">
-      <div class="mb-6 flex items-center justify-between">
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 class="text-xl font-semibold text-graphite tracking-tight">Mural de Reportes</h2>
-          <p class="text-xs text-concrete mt-1">Listado de incidencias activas en tu barrio.</p>
+          <p class="text-xs text-concrete mt-1">Listado de incidencias en tu barrio.</p>
         </div>
-        <span class="text-xs font-semibold px-3 py-1 border border-hairline bg-mist text-graphite rounded-[26px]">
-          {incidents.length} {incidents.length === 1 ? 'activo' : 'activos'}
-        </span>
+        <div class="flex items-center gap-3">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter((e.target as HTMLSelectElement).value)}
+            class="text-xs font-semibold px-3 py-1.5 border border-hairline bg-chalk text-graphite rounded-lg focus:outline-none focus:border-concrete transition-colors cursor-pointer min-h-[44px]"
+          >
+            <option value="all">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="en_gestion">En Gestión</option>
+            <option value="solucionado">Solucionados</option>
+          </select>
+          <span class="text-xs font-semibold px-3 py-1 border border-hairline bg-mist text-graphite rounded-[26px] min-h-[26px] flex items-center">
+            {incidents.length} {incidents.length === 1 ? 'reporte' : 'reportes'}
+          </span>
+        </div>
       </div>
 
       {incidents.length === 0 ? (
@@ -164,10 +179,16 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
                     class={`inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 border rounded-[26px] ${
                       incident.estado === 'pendiente'
                         ? 'border-ash text-concrete bg-mist'
-                        : 'border-graphite text-graphite bg-chalk'
+                        : incident.estado === 'en_gestion'
+                        ? 'border-graphite text-graphite bg-chalk'
+                        : 'border-hairline text-concrete bg-chalk opacity-70'
                     }`}
                   >
-                    {incident.estado === 'pendiente' ? 'Pendiente' : 'En Gestión'}
+                    {incident.estado === 'pendiente'
+                      ? 'Pendiente'
+                      : incident.estado === 'en_gestion'
+                      ? 'En Gestión'
+                      : 'Solucionado'}
                   </span>
                 </div>
                 <div class="flex items-center gap-3">

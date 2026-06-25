@@ -2,13 +2,13 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { handleCors } from "../../src/shared-kernel/http/cors.js";
 import { getAuthenticatedUser } from "../../src/shared-kernel/http/auth.js";
 import { DrizzleIncidentRepository } from "../../src/incidents/infrastructure/database/DrizzleIncidentRepository.js";
-import { ListActiveReportsUseCase } from "../../src/incidents/application/use-cases/ListActiveReportsUseCase.js";
+import { ListReportsUseCase } from "../../src/incidents/application/use-cases/ListReportsUseCase.js";
 
 /**
  * Handler HTTP GET /api/incidents/list (Driving Adapter).
  * 
- * Recupera el listado de reportes activos ('pendiente' o 'en_gestion')
- * del barrio asociado al usuario autenticado (de cualquier rol).
+ * Recupera el listado de reportes del barrio asociado al usuario autenticado,
+ * filtrados opcionalmente por estado.
  * 
  * @param request Petición entrante del cliente.
  * @param response Respuesta HTTP emitida hacia el cliente.
@@ -36,18 +36,20 @@ export default async function handler(
 
     // 3. Inyección manual de dependencias
     const repository = new DrizzleIncidentRepository();
-    const useCase = new ListActiveReportsUseCase(repository);
+    const useCase = new ListReportsUseCase(repository);
 
     // 4. Ejecución del flujo de negocio
-    const activeReports = await useCase.execute({
+    const status = request.query.status as string | undefined;
+    const reports = await useCase.execute({
       barrioId: userContext.barrioId,
+      estado: status,
     });
 
-    console.info(`[Success] Se listaron ${activeReports.length} reportes activos para el barrio ID ${userContext.barrioId}.`);
+    console.info(`[Success] Se listaron ${reports.length} reportes para el barrio ID ${userContext.barrioId}.`);
 
     return response.status(200).json({
-      message: "Listado de reportes activos recuperado exitosamente.",
-      data: activeReports.map((report) => ({
+      message: "Listado de reportes recuperado exitosamente.",
+      data: reports.map((report) => ({
         id: report.id,
         usuarioId: report.usuarioId,
         barrioId: report.barrioId,

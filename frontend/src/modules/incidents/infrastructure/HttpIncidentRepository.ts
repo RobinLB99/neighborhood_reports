@@ -47,8 +47,13 @@ export class HttpIncidentRepository implements IncidentRepository {
     return json.data as Incident;
   }
 
-  async getActiveIncidents(apiUrl: string, token: string): Promise<Incident[]> {
-    const res = await fetch(`${apiUrl}/api/incidents/list`, {
+  async getIncidents(apiUrl: string, token: string, status?: string): Promise<Incident[]> {
+    const url = new URL(`${apiUrl}/api/incidents/list`);
+    if (status) {
+      url.searchParams.append('status', status);
+    }
+
+    const res = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
