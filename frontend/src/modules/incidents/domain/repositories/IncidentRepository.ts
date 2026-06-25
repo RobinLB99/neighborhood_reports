@@ -19,6 +19,14 @@ export interface IncidentRepository {
   getComments(apiUrl: string, token: string, incidentId: number): Promise<Comment[]>;
 
   getGestiones(apiUrl: string, token: string, incidentId: number): Promise<Gestion[]>;
+
+  createGestion(
+    apiUrl: string,
+    token: string,
+    incidentId: number,
+    estadoAsignado: 'pendiente' | 'en_gestion' | 'solucionado',
+    mensaje: string
+  ): Promise<Gestion>;
 }
 
 

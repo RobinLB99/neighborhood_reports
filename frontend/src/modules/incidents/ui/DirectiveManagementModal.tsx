@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
 import { GetIncidentGestionesUseCase } from '../application/use-cases/GetIncidentGestionesUseCase';
+import { CreateIncidentGestionUseCase } from '../application/use-cases/CreateIncidentGestionUseCase';
 import type { Gestion } from '../domain/entities/Gestion';
 
 interface Props {
@@ -93,38 +94,15 @@ export default function DirectiveManagementModal({ apiUrl, token, incidentId, on
     setSubmitLoading(true);
     setSubmitError(null);
 
+    const repository = new HttpIncidentRepository();
+    const useCase = new CreateIncidentGestionUseCase(repository);
+
     try {
-      const response = await fetch(`${apiUrl}/api/incidents/${incidentId}/management`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          estadoAsignado,
-          mensaje,
-        }),
-      });
-
-      if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.message || 'Error al guardar la gestión directiva.');
-      }
-
-      const resJson = await response.json();
+      const data = await useCase.execute(apiUrl, token, incidentId, estadoAsignado, mensaje);
       
-      // Si la API tiene éxito, agregamos el nuevo registro al historial local mockeado
+      // Si la API tiene éxito, agregamos el nuevo registro al historial local
       // para que el usuario experimente reactividad inmediata en la interfaz.
-      const newGestion: Gestion = {
-        id: resJson.data?.id || Date.now(),
-        reporteId: incidentId,
-        liderId: resJson.data?.liderId || 0,
-        estadoAsignado: estadoAsignado,
-        mensaje: mensaje,
-        fechaGestion: resJson.data?.fechaGestion || new Date().toISOString(),
-      };
-
-      setGestiones((prev) => [newGestion, ...prev]);
+      setGestiones((prev) => [data, ...prev]);
       setMensaje('');
       setSubmitError(null);
       

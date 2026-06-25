@@ -172,5 +172,38 @@ export class HttpIncidentRepository implements IncidentRepository {
 
     return parsed.data;
   }
+
+  async createGestion(
+    apiUrl: string,
+    token: string,
+    incidentId: number,
+    estadoAsignado: 'pendiente' | 'en_gestion' | 'solucionado',
+    mensaje: string
+  ): Promise<Gestion> {
+    const res = await fetch(`${apiUrl}/api/incidents/${incidentId}/management`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        estadoAsignado,
+        mensaje,
+      }),
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || 'Error al guardar la gestión directiva.');
+    }
+
+    const json = await res.json();
+    const parsed = gestionResponseSchema.safeParse(json.data);
+    if (!parsed.success) {
+      throw new Error('La respuesta del servidor no tiene el formato esperado para la gestión registrada.');
+    }
+
+    return parsed.data;
+  }
 }
 
