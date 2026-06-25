@@ -6,7 +6,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 📅 Estado y Contexto General
 *   **Fecha de Creación:** 20 de Junio, 2026
-*   **Última Actualización:** 24 de Junio, 2026 (por Jarvis - Gestión y Recuperación de Comentarios en Reportes)
+*   **Última Actualización:** 25 de Junio, 2026 (por Jarvis - Refactorización de Roles de Usuario a PostgreSQL ENUM)
 *   **Entorno Principal:** Node.js (Vercel Serverless Functions) con TypeScript
 *   **Arquitectura:** Concentrada en capas concéntricas (Dominio, Aplicación, Infraestructura) siguiendo Hexagonal, Clean y Screaming Architecture (detallado en [architecture.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/architecture.md)).
 
@@ -23,6 +23,17 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 *   **Consecuencias:**
     *   **Positivas:** Paridad del 100% de la lógica y el driver de base de datos entre desarrollo y producción. Soporte nativo para ramificaciones efímeras en local.
     *   **Negativas:** El desarrollo local ahora requiere conexión a internet y credenciales válidas de Neon Cloud para levantar la base de datos de Docker.
+
+### 2. Refactorización de Roles de Usuario a PostgreSQL ENUM
+*   **Contexto:** Se utilizaba una tabla `roles` vinculada por `rol_id` en `usuarios`. Esto aumentaba la complejidad de las consultas (JOINs extras en logins y validaciones de comités) y del sembrado para tres roles estáticos (`lider`, `miembro`, `ciudadano`).
+*   **Decisión:** Eliminar la tabla `roles` y la clave foránea en favor de un tipo nativo PostgreSQL `pgEnum("user_role")` asignado a la columna `rol` en `usuarios`.
+*   **Implementación:**
+    *   Definición de `userRoleEnum = pgEnum("user_role", ["lider", "miembro", "ciudadano"])` en `src/authentication/infrastructure/database/schema.ts`.
+    *   Refactorización de `DrizzleAuthRepository.ts` y `DrizzleCommitteeRepository.ts` eliminando los `leftJoin` redundantes con la tabla `roles`.
+    *   Modificación manual de la migración `0003_tough_doctor_octopus.sql` para evitar el colapso que producía la combinación de `CASCADE` y la posterior eliminación manual de constraints.
+*   **Consecuencias:**
+    *   **Positivas:** Simplificación del modelo de datos de usuario, reducción de JOINs en consultas frecuentes y eliminación de siembras innecesarias en `seed.ts`. El frontend quedó inmune al cambio debido a que el contrato API (DTO) no se modificó.
+    *   **Negativas:** Requiere auditoría manual de las migraciones complejas de Drizzle Kit para evitar que el ORM intente ejecutar caídas de constraints secuenciales conflictivas tras cláusulas `CASCADE`.
 
 ---
 
