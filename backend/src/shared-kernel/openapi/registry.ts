@@ -12,6 +12,7 @@ import { CommitteeMembersListResponseSchema } from "../../committee/application/
 import { CreateReportPayloadSchema } from "../../incidents/domain/entities/Reporte.js";
 import { IncidentSupportParamsSchema, SupportStatsResponseSchema } from "../../incidents/domain/entities/Apoyo.js";
 import { AddCommentParamsSchema, CreateCommentPayloadSchema } from "../../incidents/domain/entities/Comentario.js";
+import { CreateGestionParamsSchema, CreateGestionPayloadSchema } from "../../incidents/domain/entities/GestionAdministrativa.js";
 
 
 export const registry = new OpenAPIRegistry();
@@ -744,6 +745,115 @@ registry.registerPath({
     },
   },
 });
+
+const CreateGestionResponseSchema = registry.register("CreateGestionResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    id: z.number(),
+    reporteId: z.number(),
+    liderId: z.number(),
+    estadoAsignado: z.string(),
+    mensaje: z.string(),
+    fechaGestion: z.string().optional(),
+  }),
+}));
+
+const GestionItemSchema = z.object({
+  id: z.number(),
+  reporteId: z.number(),
+  liderId: z.number(),
+  nombreLider: z.string().optional(),
+  estadoAsignado: z.string(),
+  mensaje: z.string(),
+  fechaGestion: z.string().optional(),
+});
+
+const ListGestionesResponseSchema = registry.register("ListGestionesResponse", z.object({
+  message: z.string(),
+  data: z.array(GestionItemSchema),
+}));
+
+
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/{id}/management",
+  summary: "Registrar gestión administrativa en reporte",
+  description: "Registra una acción de gestión (cambio de estado y bitácora) en el reporte especificado por ID. Solo accesible para líderes y miembros.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: CreateGestionParamsSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: CreateGestionPayloadSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Gestión administrativa registrada con éxito.",
+      content: {
+        "application/json": {
+          schema: CreateGestionResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Payload, ID de reporte inválido, o transición de estado inválida.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros de la directiva pueden realizar esta acción.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/{id}/management",
+  summary: "Obtener historial de gestiones de un reporte",
+  description: "Recupera la lista de gestiones administrativas asociadas a un reporte. Solo accesible para líderes y miembros de la directiva.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: CreateGestionParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Historial de gestiones recuperado con éxito.",
+      content: {
+        "application/json": {
+          schema: ListGestionesResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros de la directiva pueden acceder.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+
 
 
 

@@ -104,3 +104,10 @@ export class ReporteNotFoundError extends DomainError {
   }
 }
 
+export class InvalidStateTransitionError extends DomainError {
+  constructor(message: string) {
+    super(message, "INVALID_STATE_TRANSITION");
+  }
+}
+
+

@@ -1112,6 +1112,150 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/incidents/{id}/management": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener historial de gestiones de un reporte
+         * @description Recupera la lista de gestiones administrativas asociadas a un reporte. Solo accesible para líderes y miembros de la directiva.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Historial de gestiones recuperado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListGestionesResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros de la directiva pueden acceder. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Registrar gestión administrativa en reporte
+         * @description Registra una acción de gestión (cambio de estado y bitácora) en el reporte especificado por ID. Solo accesible para líderes y miembros.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        estadoAsignado: "pendiente" | "en_gestion" | "solucionado";
+                        mensaje: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Gestión administrativa registrada con éxito. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateGestionResponse"];
+                    };
+                };
+                /** @description Payload, ID de reporte inválido, o transición de estado inválida. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros de la directiva pueden realizar esta acción. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1277,6 +1421,29 @@ export interface components {
                 usuarioId: number;
                 mensaje: string;
                 fechaCreacion?: string;
+            }[];
+        };
+        CreateGestionResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                liderId: number;
+                estadoAsignado: string;
+                mensaje: string;
+                fechaGestion?: string;
+            };
+        };
+        ListGestionesResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                liderId: number;
+                nombreLider?: string;
+                estadoAsignado: string;
+                mensaje: string;
+                fechaGestion?: string;
             }[];
         };
     };

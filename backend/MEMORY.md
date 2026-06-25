@@ -182,4 +182,6 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 - [x] Diseñar e implementar el flujo de subidas firmadas a Cloudinary e insertar reportes ciudadanos (`POST /api/incidents/create`).
 - [x] Implementar la consulta y listado de reportes barriales activos (`GET /api/incidents/list`).
 - [x] Diseñar e implementar el endpoint de comentarios en reportes (`POST` y `GET /api/incidents/[id]/comments`).
+- [x] Diseñar e implementar el endpoint de registro de gestión administrativa (`POST /api/incidents/[id]/management`) para líderes/miembros.
+- [ ] Renombrar la columna `lider_id` a `usuario_id` en la tabla `gestiones_directiva` mediante una migración de Drizzle.
 - [ ] Continuar estructurando las capas concéntricas de los dominios (`worker-profile`, `identity-validation`, etc.).

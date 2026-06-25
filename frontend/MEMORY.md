@@ -69,3 +69,5 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
 2.  **Validación de Estados de Foco y Contraste:** Asegurar que los componentes interactivos utilicen indicadores de enfoque altamente visibles que cumplan con la relación de contraste **3:1** (WCAG 1.4.11) sobre fondo blanco.
+3.  **Refactorización de Creación de Gestión Directiva (POST) en Modal:** Extraer la llamada HTTP POST directa de `DirectiveManagementModal.tsx` (`handleSubmit`) a un caso de uso (`CreateIncidentGestionUseCase`) y al repositorio correspondiente para cumplir al 100% con la Arquitectura Hexagonal.
+

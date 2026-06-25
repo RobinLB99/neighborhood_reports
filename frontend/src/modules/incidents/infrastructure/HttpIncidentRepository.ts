@@ -2,6 +2,7 @@ import type { IncidentRepository } from '../domain/repositories/IncidentReposito
 import type { Incident } from '../domain/entities/Incident';
 import type { SupportStats, ToggleSupportResult } from '../domain/entities/SupportStats';
 import type { Comment } from '../domain/entities/Comment';
+import type { Gestion } from '../domain/entities/Gestion';
 import { z } from 'zod';
 
 const commentResponseSchema = z.object({
@@ -10,6 +11,16 @@ const commentResponseSchema = z.object({
   usuarioId: z.number(),
   mensaje: z.string(),
   fechaCreacion: z.string().optional(),
+});
+
+const gestionResponseSchema = z.object({
+  id: z.number(),
+  reporteId: z.number(),
+  liderId: z.number(),
+  nombreLider: z.string().optional(),
+  estadoAsignado: z.enum(['pendiente', 'en_gestion', 'solucionado']),
+  mensaje: z.string(),
+  fechaGestion: z.string().optional(),
 });
 
 export class HttpIncidentRepository implements IncidentRepository {
@@ -134,6 +145,29 @@ export class HttpIncidentRepository implements IncidentRepository {
     const parsed = z.array(commentResponseSchema).safeParse(json.data);
     if (!parsed.success) {
       throw new Error('La respuesta del servidor no tiene el formato esperado.');
+    }
+
+    return parsed.data;
+  }
+
+  async getGestiones(apiUrl: string, token: string, incidentId: number): Promise<Gestion[]> {
+    const res = await fetch(`${apiUrl}/api/incidents/${incidentId}/management`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.message || 'Error al obtener el historial de gestiones.');
+    }
+
+    const json = await res.json();
+    const parsed = z.array(gestionResponseSchema).safeParse(json.data);
+    if (!parsed.success) {
+      throw new Error('La respuesta del servidor no tiene el formato esperado para las gestiones.');
     }
 
     return parsed.data;

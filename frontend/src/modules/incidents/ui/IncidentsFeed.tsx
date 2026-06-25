@@ -5,6 +5,7 @@ import type { Incident } from '../domain/entities/Incident';
 import IncidentSupportButton from './IncidentSupportButton';
 import IncidentCommentForm from './IncidentCommentForm';
 import IncidentCommentsModal from './IncidentCommentsModal';
+import DirectiveManagementModal from './DirectiveManagementModal';
 
 
 interface Props {
@@ -20,6 +21,7 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [activeCommentIncidentIds, setActiveCommentIncidentIds] = useState<Record<number, boolean>>({});
   const [viewCommentsIncidentId, setViewCommentsIncidentId] = useState<number | null>(null);
+  const [selectedDirectiveIncidentId, setSelectedDirectiveIncidentId] = useState<number | null>(null);
 
   const toggleCommentForm = (incidentId: number) => {
     setActiveCommentIncidentIds((prev) => ({
@@ -202,17 +204,30 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
                   </button>
 
                   {(userRole === 'lider' || userRole === 'miembro') && (
-                    <button
-                      onClick={() => setViewCommentsIncidentId(incident.id)}
-                      class="shrink-0 inline-flex items-center justify-center gap-0 sm:gap-1.5 text-xs font-semibold bg-chalk text-graphite border border-hairline rounded-lg w-11 sm:w-auto px-0 sm:px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] select-none"
-                      aria-label="Ver comentarios de este reporte"
-                    >
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span class="hidden sm:inline">Ver Comentarios</span>
-                    </button>
+                    <>
+                      <button
+                        onClick={() => setViewCommentsIncidentId(incident.id)}
+                        class="shrink-0 inline-flex items-center justify-center gap-0 sm:gap-1.5 text-xs font-semibold bg-chalk text-graphite border border-hairline rounded-lg w-11 sm:w-auto px-0 sm:px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] select-none"
+                        aria-label="Ver comentarios de este reporte"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span class="hidden sm:inline">Ver Comentarios</span>
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedDirectiveIncidentId(incident.id)}
+                        class="shrink-0 inline-flex items-center justify-center gap-0 sm:gap-1.5 text-xs font-semibold bg-chalk text-graphite border border-hairline rounded-lg w-11 sm:w-auto px-0 sm:px-4 h-11 hover:bg-mist transition-colors cursor-pointer min-h-[44px] select-none"
+                        aria-label="Gestión directiva de este reporte"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span class="hidden sm:inline">Gestión Directiva</span>
+                      </button>
+                    </>
                   )}
 
                   {incident.ubicacion && (
@@ -285,6 +300,19 @@ export default function IncidentsFeed({ apiUrl, token, userRole }: Props) {
           token={token}
           incidentId={viewCommentsIncidentId}
           onClose={() => setViewCommentsIncidentId(null)}
+        />
+      )}
+
+      {/* Modal de gestión directiva */}
+      {selectedDirectiveIncidentId !== null && (
+        <DirectiveManagementModal
+          apiUrl={apiUrl}
+          token={token}
+          incidentId={selectedDirectiveIncidentId}
+          onClose={() => setSelectedDirectiveIncidentId(null)}
+          onSuccess={() => {
+            fetchIncidents();
+          }}
         />
       )}
     </div>

@@ -1,6 +1,7 @@
 import type { Incident } from '../entities/Incident';
 import type { SupportStats, ToggleSupportResult } from '../entities/SupportStats';
 import type { Comment } from '../entities/Comment';
+import type { Gestion } from '../entities/Gestion';
 
 export interface IncidentRepository {
   createIncident(
@@ -16,5 +17,8 @@ export interface IncidentRepository {
 
   addComment(apiUrl: string, token: string, incidentId: number, message: string): Promise<Comment>;
   getComments(apiUrl: string, token: string, incidentId: number): Promise<Comment[]>;
+
+  getGestiones(apiUrl: string, token: string, incidentId: number): Promise<Gestion[]>;
 }
+
 
