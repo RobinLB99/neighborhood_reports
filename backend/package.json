@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
+    "packageManager": "pnpm@11.9.0",
     "scripts": {
         "dev": "tsc --watch",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,7 +19,7 @@
     "devEngines": {
         "packageManager": {
             "name": "pnpm",
-            "version": "^11.7.0",
+            "version": "^11.9.0",
             "onFail": "download"
         }
     },
