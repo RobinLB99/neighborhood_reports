@@ -118,6 +118,10 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
         *   **Optimización del Campo Dirección:** Se removió la clase `truncate` y se aplicó `break-words font-medium` para evitar que las direcciones largas se corten, permitiendo saltos de línea adaptables.
         *   **Contenedor de Botones Dinámico:** Se agruparon las acciones inferiores bajo un contenedor `flex flex-wrap items-center gap-2 w-full pt-1` para que fluyan en su propia línea inferior en cualquier tamaño de pantalla.
         *   **Validación:** Se ejecutó con éxito `pnpm build` para asegurar la integridad de la compilación.
+18. **Banner Dinámico de Registro con Soporte SSG [2026-06-25]:**
+    *   **Impacto técnico:**
+        *   **Lógica del lado del cliente:** Debido a que el proyecto compila como sitio estático (SSG), la evaluación de parámetros en el servidor Astro solo ocurre en tiempo de compilación. Se solucionó implementando la lectura de parámetros (`status`, `message`, `registered`) en el cliente mediante un bloque `<script>` nativo en `login.astro`.
+        *   **Apego estricto a DESIGN.md:** Se diseñaron banners acromáticos evitando el uso de colores prohibidos (rojo/verde). El estado `success` utiliza una superficie clara (`bg-mist`, `border-hairline`) y el estado `error` una superficie invertida o de alta tensión (`bg-carbon`, `text-chalk`) con íconos vectoriales para guiar al usuario.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.
