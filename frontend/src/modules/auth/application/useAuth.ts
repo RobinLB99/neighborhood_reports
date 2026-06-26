@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 
-interface User {
+export interface User {
   id: number;
   nombre: string;
   usuario: string;
