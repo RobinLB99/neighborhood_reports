@@ -54,8 +54,8 @@ export class ListReportsUseCase {
     let nextCursor: string | null = null;
     if (reports.length === limit && reports.length > 0) {
       const lastReport = reports[reports.length - 1];
-      if (lastReport.fechaCreacion) {
-        nextCursor = lastReport.fechaCreacion.toISOString();
+      if (lastReport && lastReport.fechaCreacion) {
+          nextCursor = lastReport.fechaCreacion.toISOString();
       }
     }
 
