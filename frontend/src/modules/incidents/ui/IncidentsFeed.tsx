@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+import { useScrollLock } from '../../../shared/hooks/useScrollLock';
 import { GetIncidentsUseCase } from '../application/use-cases/GetIncidentsUseCase';
 import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
 import type { Incident } from '../domain/entities/Incident';
@@ -17,10 +18,11 @@ interface Props {
 }
 
 export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }: Props) {
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  useScrollLock(!!selectedPhoto);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [activeCommentIncidentIds, setActiveCommentIncidentIds] = useState<Record<number, boolean>>({});
   const [viewCommentsIncidentId, setViewCommentsIncidentId] = useState<number | null>(null);
   const [selectedDirectiveIncidentId, setSelectedDirectiveIncidentId] = useState<number | null>(null);

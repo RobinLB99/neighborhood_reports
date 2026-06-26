@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+import { useScrollLock } from '../../../shared/hooks/useScrollLock';
 import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
 import { GetIncidentCommentsUseCase } from '../application/use-cases/GetIncidentCommentsUseCase';
 import type { Comment } from '../domain/entities/Comment';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function IncidentCommentsModal({ apiUrl, token, incidentId, onClose }: Props) {
+  useScrollLock(true);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

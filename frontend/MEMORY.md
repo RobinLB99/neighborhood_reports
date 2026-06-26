@@ -107,6 +107,11 @@ El proyecto se rige por las directrices de **Astro + Arquitectura Hexagonal y Li
             *   Implementamos el método `loadMoreIncidents` para acumular nuevos reportes (`prev => [...prev, ...newData]`) de forma reactiva.
             *   Diseñamos y renderizamos un botón de 44px de alto **"Cargar Más Reportes"** que aparece condicionalmente en la interfaz si hay más páginas (`nextCursor !== null`), deshabilitándolo con un estado visual de carga durante la petición HTTP.
             *   Garantizamos que al cambiar de filtro de estados, el feed de incidencias se resetea por completo a su estado inicial.
+16. **Deshabilitar Scroll de Fondo en Modales Activos [2026-06-25]:**
+    *   **Impacto técnico:**
+        *   **Creación del Hook Reutilizable (`useScrollLock`):** Diseñamos e implementamos el custom hook [useScrollLock.ts](file:///home/joel/Proyectos%20Full-Stack/reports/frontend/src/shared/hooks/useScrollLock.ts) en Preact. Este almacena dinámicamente el estilo `overflow` original del body del documento y le aplica `hidden` mientras está activo para bloquear el scroll del viewport. Al desmontar el componente, se restablece el estilo de forma segura.
+        *   **Integración en Modales:** Importamos y consumimos el hook en los componentes de interfaz del módulo de incidencias: [ConfirmDeleteModal.tsx](file:///home/joel/Proyectos%20Full-Stack/reports/frontend/src/modules/incidents/ui/ConfirmDeleteModal.tsx), [DirectiveManagementModal.tsx](file:///home/joel/Proyectos%20Full-Stack/reports/frontend/src/modules/incidents/ui/DirectiveManagementModal.tsx), [IncidentCommentsModal.tsx](file:///home/joel/Proyectos%20Full-Stack/reports/frontend/src/modules/incidents/ui/IncidentCommentsModal.tsx) y en la vista de fotos a pantalla completa en [IncidentsFeed.tsx](file:///home/joel/Proyectos%20Full-Stack/reports/frontend/src/modules/incidents/ui/IncidentsFeed.tsx).
+        *   **Validación:** Verificamos que el proyecto compila limpiamente a nivel estático (`pnpm build`) sin fallos de TypeScript o dependencias.
 
 ## Siguientes Pasos
 1.  **Auditoría de Componentes UI Existentes:** Revisar las implementaciones actuales en la capa `ui/` de cada módulo para asegurar la adopción de los nuevos tokens `--spacing-*` y tipografías en unidades `rem`.

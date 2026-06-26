@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+import { useScrollLock } from '../../../shared/hooks/useScrollLock';
 import { HttpIncidentRepository } from '../infrastructure/HttpIncidentRepository';
 import { GetIncidentGestionesUseCase } from '../application/use-cases/GetIncidentGestionesUseCase';
 import { CreateIncidentGestionUseCase } from '../application/use-cases/CreateIncidentGestionUseCase';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function DirectiveManagementModal({ apiUrl, token, incidentId, onClose, onSuccess }: Props) {
+  useScrollLock(true);
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [submitLoading, setSubmitLoading] = useState<boolean>(false);

@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks';
+import { useScrollLock } from '../../../shared/hooks/useScrollLock';
 
 interface Props {
   incidentId: number;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function ConfirmDeleteModal({ incidentId, onClose, onConfirm, loading, error }: Props) {
+  useScrollLock(true);
 
   return (
     <div
