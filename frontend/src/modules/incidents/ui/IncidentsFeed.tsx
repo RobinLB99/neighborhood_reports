@@ -269,17 +269,17 @@ export default function IncidentsFeed({ apiUrl, token, userRole, currentUserId }
               )}
 
               {/* Footer: Dirección y Enlace al mapa */}
-              <div class="mt-5 border-t border-hairline pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-start gap-2 text-xs text-concrete min-w-0">
+              <div class="mt-5 border-t border-hairline pt-4 flex flex-col gap-3">
+                <div class="flex items-start gap-2 text-xs text-concrete">
                   <svg class="w-4 h-4 text-concrete shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span class="truncate leading-relaxed" title={incident.direccion}>
+                  <span class="leading-relaxed font-medium break-words" title={incident.direccion}>
                     {incident.direccion}
                   </span>
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                <div class="flex flex-wrap items-center gap-2 w-full pt-1">
                   <IncidentSupportButton apiUrl={apiUrl} token={token} incidentId={incident.id} />
                   
                   <button
