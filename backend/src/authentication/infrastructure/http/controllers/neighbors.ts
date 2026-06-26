@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../src/shared-kernel/http/auth.js";
-import { DrizzleAuthRepository } from "../../src/authentication/infrastructure/database/DrizzleAuthRepository.js";
-import { GetNeighborsUseCase } from "../../src/authentication/application/use-cases/GetNeighborsUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleAuthRepository } from "../../../../authentication/infrastructure/database/DrizzleAuthRepository.js";
+import { GetNeighborsUseCase } from "../../../../authentication/application/use-cases/GetNeighborsUseCase.js";
 
 /**
  * Handler HTTP GET /api/users/neighbors (Driving Adapter).

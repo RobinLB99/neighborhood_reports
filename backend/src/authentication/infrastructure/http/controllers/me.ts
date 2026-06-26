@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../src/shared-kernel/http/auth.js";
-import { DrizzleAuthRepository } from "../../src/authentication/infrastructure/database/DrizzleAuthRepository.js";
-import { GetProfileUseCase } from "../../src/authentication/application/use-cases/GetProfileUseCase.js";
-import { UserNotFoundError } from "../../src/shared-kernel/errors/DomainErrors.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleAuthRepository } from "../../../../authentication/infrastructure/database/DrizzleAuthRepository.js";
+import { GetProfileUseCase } from "../../../../authentication/application/use-cases/GetProfileUseCase.js";
+import { UserNotFoundError } from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP GET /api/auth/me (Driving Adapter).

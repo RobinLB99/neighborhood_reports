@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../src/shared-kernel/http/auth.js";
-import { CloudinaryImageUploader } from "../../src/shared-kernel/storage/infrastructure/CloudinaryImageUploader.js";
+import { handleCors } from "../../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../../shared-kernel/http/auth.js";
+import { CloudinaryImageUploader } from "../../../../../shared-kernel/storage/infrastructure/CloudinaryImageUploader.js";
 
 /**
  * Handler HTTP GET /api/storage/signature (Driving Adapter).

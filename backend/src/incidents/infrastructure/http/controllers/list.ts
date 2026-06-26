@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../src/shared-kernel/http/auth.js";
-import { DrizzleIncidentRepository } from "../../src/incidents/infrastructure/database/DrizzleIncidentRepository.js";
-import { ListReportsUseCase } from "../../src/incidents/application/use-cases/ListReportsUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleIncidentRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentRepository.js";
+import { ListReportsUseCase } from "../../../../incidents/application/use-cases/ListReportsUseCase.js";
 
 /**
  * Handler HTTP GET /api/incidents/list (Driving Adapter).

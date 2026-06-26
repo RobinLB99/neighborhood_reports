@@ -1,14 +1,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { RegisterUserSchema } from "../../src/authentication/application/dtos/RegisterUserDto.js";
-import { DrizzleAuthRepository } from "../../src/authentication/infrastructure/database/DrizzleAuthRepository.js";
-import { DrizzleCommitteeExistsGateway } from "../../src/authentication/infrastructure/database/DrizzleCommitteeExistsGateway.js";
-import { RegisterUserUseCase } from "../../src/authentication/application/use-cases/RegisterUserUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { RegisterUserSchema } from "../../../../authentication/application/dtos/RegisterUserDto.js";
+import { DrizzleAuthRepository } from "../../../../authentication/infrastructure/database/DrizzleAuthRepository.js";
+import { DrizzleCommitteeExistsGateway } from "../../../../authentication/infrastructure/database/DrizzleCommitteeExistsGateway.js";
+import { RegisterUserUseCase } from "../../../../authentication/application/use-cases/RegisterUserUseCase.js";
 import {
   UsernameAlreadyTakenError,
   BarrioNotFoundError,
   CommitteeNotFoundError,
-} from "../../src/shared-kernel/errors/DomainErrors.js";
+} from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP POST /api/auth/register (Driving Adapter).
