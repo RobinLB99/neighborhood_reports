@@ -2,17 +2,7 @@ import { next } from "@vercel/edge";
 import { jwtVerify } from "jose";
 
 /**
- * Vercel Edge Middleware - Filtro Global de Seguridad.
- *
- * Se ejecuta en la red global distribuida de Vercel (Edge Runtime).
- * Intercepta las solicitudes entrantes antes de que alcancen las funciones serverless de Node.js.
- *
- * Responsabilidades:
- * 1. Omitir validación para rutas públicas declaradas en `PUBLIC_PATHS`.
- * 2. Extraer y validar firmas JWT en la cabecera `Authorization: Bearer <token>`.
- * 3. En caso de token válido, inyectar el contexto de identidad (`x-user-id`, `x-user-role`, `x-user-barrio-id`)
- *    en las cabeceras HTTP de la petición que se propaga a los controladores (downstream handlers).
- * 4. Retornar respuestas rápidas 401 sin incurrir en latencias de base de datos ni tiempos de cold start del backend.
+ * Vercel Edge Middleware - Filtro Global de Seguridad con soporte CORS.
  */
 const PUBLIC_PATHS = [
     "/api/health",
@@ -27,13 +17,27 @@ const PUBLIC_PATHS = [
 export default async function middleware(request: Request) {
     const url = new URL(request.url);
     const pathname = url.pathname;
+    const origin = request.headers.get("origin") || "*";
 
-    // Dejar pasar preflight CORS — OPTIONS nunca lleva Authorization header
+    // Cabeceras CORS estándar para reutilizar tanto en errores como en respuestas preflight
+    const corsHeaders = {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods":
+            "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers":
+            "Content-Type, Authorization, X-Requested-With",
+        "Access-Control-Allow-Credentials": "true",
+    };
+
+    // 1. Interceptar e Interrumpir peticiones preflight CORS (OPTIONS) directamente en el Edge
     if (request.method === "OPTIONS") {
-        return next();
+        return new Response(null, {
+            status: 200,
+            headers: corsHeaders,
+        });
     }
 
-    // 1. Omitir validación para rutas públicas conocidas
+    // 2. Omitir validación de JWT para rutas públicas conocidas
     if (
         PUBLIC_PATHS.some(
             (path) => pathname === path || pathname.startsWith(path + "/"),
@@ -42,7 +46,7 @@ export default async function middleware(request: Request) {
         return next();
     }
 
-    // 2. Extraer y validar la cabecera de Autorización
+    // 3. Extraer y validar la cabecera de Autorización
     const authHeader = request.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return new Response(
@@ -53,14 +57,13 @@ export default async function middleware(request: Request) {
             }),
             {
                 status: 401,
-                headers: { "content-type": "application/json" },
+                headers: { ...corsHeaders, "content-type": "application/json" }, // 👈 CORS agregado a errores
             },
         );
     }
 
     const token = authHeader.split(" ")[1];
 
-    // AGREGA ESTA GUARDIA AQUÍ PARA LIMPIAR EL TIPO UNDEFINED
     if (!token) {
         return new Response(
             JSON.stringify({
@@ -70,7 +73,7 @@ export default async function middleware(request: Request) {
             }),
             {
                 status: 401,
-                headers: { "content-type": "application/json" },
+                headers: { ...corsHeaders, "content-type": "application/json" }, // 👈 CORS agregado a errores
             },
         );
     }
@@ -89,12 +92,14 @@ export default async function middleware(request: Request) {
                 }),
                 {
                     status: 500,
-                    headers: { "content-type": "application/json" },
+                    headers: {
+                        ...corsHeaders,
+                        "content-type": "application/json",
+                    },
                 },
             );
         }
 
-        // Ahora TypeScript sabe con 100% de certeza que 'token' es un string válido 🎉
         const secretKey = new TextEncoder().encode(secret);
         const { payload } = await jwtVerify(token, secretKey);
 
@@ -130,7 +135,7 @@ export default async function middleware(request: Request) {
             }),
             {
                 status: 401,
-                headers: { "content-type": "application/json" },
+                headers: { ...corsHeaders, "content-type": "application/json" }, // 👈 CORS agregado a errores
             },
         );
     }
