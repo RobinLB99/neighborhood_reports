@@ -292,7 +292,7 @@ export default function ReportIncidentForm({ apiUrl }: Props) {
                     {/* Contenedor del Mapa */}
                     <div 
                       ref={mapRef} 
-                      class="h-[260px] w-full border border-hairline rounded-lg bg-mist z-0"
+                      class="h-65 w-full border border-hairline rounded-lg bg-mist z-0"
                     />
                   </div>
 
@@ -317,7 +317,7 @@ export default function ReportIncidentForm({ apiUrl }: Props) {
                   <div class="flex items-center gap-4">
                     {/* Botón de carga personalizado (Touch target de mínimo 44px) */}
                     <label 
-                      class={`flex-1 border border-dashed border-smoke hover:border-graphite rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-colors min-h-[46px] px-4 text-sm text-graphite ${
+                      class={`flex-1 border border-dashed border-smoke hover:border-graphite rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-colors min-h-11.5 px-4 text-sm text-graphite ${
                         isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
@@ -336,7 +336,7 @@ export default function ReportIncidentForm({ apiUrl }: Props) {
 
                     {/* Previsualización instantánea */}
                     {imagePreview && (
-                      <div class="w-16 h-16 border border-hairline rounded-lg overflow-hidden flex-shrink-0 bg-mist flex items-center justify-center">
+                      <div class="w-16 h-16 border border-hairline rounded-lg overflow-hidden shrink-0 bg-mist flex items-center justify-center">
                         <img src={imagePreview} alt="Vista previa" class="object-cover w-full h-full" />
                       </div>
                     )}
