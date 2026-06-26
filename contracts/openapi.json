@@ -370,6 +370,394 @@
           "message",
           "data"
         ]
+      },
+      "StorageSignatureResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "signature": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "number"
+              },
+              "folder": {
+                "type": "string"
+              },
+              "apiKey": {
+                "type": "string"
+              },
+              "cloudName": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "signature",
+              "timestamp",
+              "folder",
+              "apiKey",
+              "cloudName"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "CreateReportResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "usuarioId": {
+                "type": "number"
+              },
+              "barrioId": {
+                "type": "number"
+              },
+              "direccion": {
+                "type": "string"
+              },
+              "ubicacion": {
+                "type": "string"
+              },
+              "fotoUrl": {
+                "type": "string"
+              },
+              "estado": {
+                "type": "string"
+              },
+              "descripcion": {
+                "type": "string"
+              },
+              "fechaCreacion": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "usuarioId",
+              "barrioId",
+              "direccion",
+              "ubicacion",
+              "fotoUrl",
+              "estado",
+              "descripcion"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "ListReportsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "usuarioId": {
+                  "type": "number"
+                },
+                "barrioId": {
+                  "type": "number"
+                },
+                "direccion": {
+                  "type": "string"
+                },
+                "ubicacion": {
+                  "type": "string"
+                },
+                "fotoUrl": {
+                  "type": "string"
+                },
+                "estado": {
+                  "type": "string"
+                },
+                "descripcion": {
+                  "type": "string"
+                },
+                "fechaCreacion": {
+                  "type": "string"
+                },
+                "fechaActualizacion": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "usuarioId",
+                "barrioId",
+                "direccion",
+                "ubicacion",
+                "fotoUrl",
+                "estado",
+                "descripcion"
+              ]
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "message",
+          "data",
+          "nextCursor"
+        ]
+      },
+      "ToggleSupportResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "supported": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "supported"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "SupportStatsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number"
+              },
+              "hasSupported": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "count",
+              "hasSupported"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "CreateCommentResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "reporteId": {
+                "type": "number"
+              },
+              "usuarioId": {
+                "type": "number"
+              },
+              "mensaje": {
+                "type": "string"
+              },
+              "fechaCreacion": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "reporteId",
+              "usuarioId",
+              "mensaje"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "ListCommentsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "reporteId": {
+                  "type": "number"
+                },
+                "usuarioId": {
+                  "type": "number"
+                },
+                "mensaje": {
+                  "type": "string"
+                },
+                "fechaCreacion": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "reporteId",
+                "usuarioId",
+                "mensaje"
+              ]
+            }
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "CreateGestionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "reporteId": {
+                "type": "number"
+              },
+              "liderId": {
+                "type": "number"
+              },
+              "estadoAsignado": {
+                "type": "string"
+              },
+              "mensaje": {
+                "type": "string"
+              },
+              "fechaGestion": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "reporteId",
+              "liderId",
+              "estadoAsignado",
+              "mensaje"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "ListGestionesResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "reporteId": {
+                  "type": "number"
+                },
+                "liderId": {
+                  "type": "number"
+                },
+                "nombreLider": {
+                  "type": "string"
+                },
+                "estadoAsignado": {
+                  "type": "string"
+                },
+                "mensaje": {
+                  "type": "string"
+                },
+                "fechaGestion": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "reporteId",
+                "liderId",
+                "estadoAsignado",
+                "mensaje"
+              ]
+            }
+          }
+        },
+        "required": [
+          "message",
+          "data"
+        ]
+      },
+      "DeleteIncidentResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
       }
     },
     "parameters": {}
@@ -818,6 +1206,564 @@
           },
           "404": {
             "description": "Comité no encontrado para el barrio del usuario."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/storage/signature": {
+      "get": {
+        "summary": "Obtener firma para subida directa de imágenes",
+        "description": "Genera una firma criptográfica para permitir al frontend subir imágenes directamente a Cloudinary.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Carpeta de destino en Cloudinary"
+            },
+            "required": false,
+            "description": "Carpeta de destino en Cloudinary",
+            "name": "folder",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Firma de Cloudinary generada con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageSignatureResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/create": {
+      "post": {
+        "summary": "Crear reporte de incidencia",
+        "description": "Permite registrar un reporte de incidencia ciudadana en el barrio del usuario autenticado.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "direccion": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 255
+                  },
+                  "ubicacion": {
+                    "type": "string",
+                    "pattern": "^-?\\d+(?:\\.\\d+)?\\s*,\\s*-?\\d+(?:\\.\\d+)?$"
+                  },
+                  "fotoUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "direccion",
+                  "ubicacion",
+                  "fotoUrl",
+                  "descripcion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Reporte de incidencia registrado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateReportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El payload enviado contiene errores de validación."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/list": {
+      "get": {
+        "summary": "Listar reportes del barrio",
+        "description": "Recupera los reportes barriales filtrados por estado para el barrio del usuario autenticado (cualquier rol).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pendiente",
+                "en_gestion",
+                "solucionado",
+                "all"
+              ],
+              "description": "Filtrar por estado del reporte"
+            },
+            "required": false,
+            "description": "Filtrar por estado del reporte",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "number",
+              "nullable": true,
+              "description": "Límite de reportes a recuperar (por defecto 10)"
+            },
+            "required": false,
+            "description": "Límite de reportes a recuperar (por defecto 10)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Cursor (fecha ISO) para paginación"
+            },
+            "required": false,
+            "description": "Cursor (fecha ISO) para paginación",
+            "name": "cursor",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listado de reportes recuperado con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListReportsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/{id}/supports": {
+      "post": {
+        "summary": "Alternar apoyo a reporte (Corazón)",
+        "description": "Registra o elimina un apoyo (like) en el reporte especificado por ID para el usuario autenticado.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Apoyo alternado con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToggleSupportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido o erróneo."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      },
+      "get": {
+        "summary": "Obtener estadísticas de apoyos de un reporte",
+        "description": "Recupera la cantidad total de apoyos y si el usuario autenticado lo ha apoyado.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estadísticas de apoyos recuperadas con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportStatsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido o erróneo."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/{id}/comments": {
+      "post": {
+        "summary": "Registrar comentario en reporte",
+        "description": "Registra un comentario en el reporte especificado por ID para el usuario autenticado.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mensaje": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "mensaje"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comentario registrado con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCommentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Payload o ID de reporte inválido."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      },
+      "get": {
+        "summary": "Obtener comentarios de un reporte",
+        "description": "Recupera la lista de comentarios de un reporte de incidencia específico. Solo accesible para líderes y miembros.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listado de comentarios recuperado con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCommentsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "403": {
+            "description": "Acceso denegado. Solo líderes y miembros pueden acceder."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/{id}/management": {
+      "post": {
+        "summary": "Registrar gestión administrativa en reporte",
+        "description": "Registra una acción de gestión (cambio de estado y bitácora) en el reporte especificado por ID. Solo accesible para líderes y miembros.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "estadoAsignado": {
+                    "type": "string",
+                    "enum": [
+                      "pendiente",
+                      "en_gestion",
+                      "solucionado"
+                    ]
+                  },
+                  "mensaje": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "estadoAsignado",
+                  "mensaje"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gestión administrativa registrada con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateGestionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Payload, ID de reporte inválido, o transición de estado inválida."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "403": {
+            "description": "Acceso denegado. Solo líderes y miembros de la directiva pueden realizar esta acción."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      },
+      "get": {
+        "summary": "Obtener historial de gestiones de un reporte",
+        "description": "Recupera la lista de gestiones administrativas asociadas a un reporte. Solo accesible para líderes y miembros de la directiva.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial de gestiones recuperado con éxito.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListGestionesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "403": {
+            "description": "Acceso denegado. Solo líderes y miembros de la directiva pueden acceder."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        }
+      }
+    },
+    "/api/incidents/{id}/delete": {
+      "delete": {
+        "summary": "Eliminación lógica de un reporte",
+        "description": "Realiza el borrado lógico de un reporte de incidencia. Los líderes y miembros pueden eliminar cualquier reporte. Los ciudadanos solo pueden eliminar sus propios reportes.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reporte eliminado exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteIncidentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID de reporte inválido."
+          },
+          "401": {
+            "description": "No autorizado o token JWT inválido."
+          },
+          "403": {
+            "description": "Acceso denegado. El usuario no posee permisos para eliminar este reporte."
+          },
+          "404": {
+            "description": "Reporte no encontrado en el sistema o ya inactivo."
           },
           "500": {
             "description": "Error interno del servidor."

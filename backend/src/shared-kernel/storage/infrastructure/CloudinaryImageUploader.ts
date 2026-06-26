@@ -1,8 +1,9 @@
 import { v2 as cloudinary } from "cloudinary";
 import type { ImageUploader } from "../domain/ImageUploader.interface.js";
+import type { ImageSignature, ImageSignatureProvider } from "../domain/ImageSignatureProvider.interface.js";
 import { StoredImage } from "../domain/storage.js";
 
-export class CloudinaryImageUploader implements ImageUploader {
+export class CloudinaryImageUploader implements ImageUploader, ImageSignatureProvider {
     constructor() {
         // Validamos la existencia de credenciales de forma temprana para evitar fallos silenciosos
         if (
@@ -48,4 +49,33 @@ export class CloudinaryImageUploader implements ImageUploader {
             throw new Error(`[Storage Infrastructure Error]: ${errorMessage}`);
         }
     }
+
+    generateSignature(folder: string): ImageSignature {
+        const timestamp = Math.round(new Date().getTime() / 1000);
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+        const apiKey = process.env.CLOUDINARY_API_KEY;
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+        if (!apiSecret || !apiKey || !cloudName) {
+            throw new Error(
+                "[Storage Infrastructure Error]: Missing Cloudinary credentials to generate signature."
+            );
+        }
+
+        const paramsToSign = {
+            timestamp,
+            folder,
+        };
+
+        const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
+
+        return {
+            signature,
+            timestamp,
+            folder,
+            apiKey,
+            cloudName,
+        };
+    }
 }
+

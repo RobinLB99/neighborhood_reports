@@ -2,7 +2,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "../../../shared-kernel/database/drizzle.js";
 import { User } from "../../domain/entities/User.js";
 import type { AuthRepository } from "../../domain/repositories/AuthRepository.interface.js";
-import { usuarios, roles } from "./schema.js";
+import { usuarios } from "./schema.js";
 import { UsernameAlreadyTakenError, BarrioNotFoundError } from "../../../shared-kernel/errors/DomainErrors.js";
 
 export class DrizzleAuthRepository implements AuthRepository {
@@ -18,10 +18,9 @@ export class DrizzleAuthRepository implements AuthRepository {
         usuario: usuarios.usuario,
         contrasenaHash: usuarios.contrasenaHash,
         fechaRegistro: usuarios.fechaRegistro,
-        rolNombre: roles.nombre,
+        rol: usuarios.rol,
       })
       .from(usuarios)
-      .leftJoin(roles, eq(usuarios.rolId, roles.id))
       .where(eq(usuarios.usuario, usuario))
       .limit(1);
 
@@ -40,7 +39,7 @@ export class DrizzleAuthRepository implements AuthRepository {
       row.nombre,
       row.usuario,
       row.contrasenaHash,
-      row.rolNombre ?? "ciudadano",
+      row.rol,
       row.fechaRegistro ?? undefined
     );
   }
@@ -57,10 +56,9 @@ export class DrizzleAuthRepository implements AuthRepository {
         usuario: usuarios.usuario,
         contrasenaHash: usuarios.contrasenaHash,
         fechaRegistro: usuarios.fechaRegistro,
-        rolNombre: roles.nombre,
+        rol: usuarios.rol,
       })
       .from(usuarios)
-      .leftJoin(roles, eq(usuarios.rolId, roles.id))
       .where(eq(usuarios.id, id))
       .limit(1);
 
@@ -79,7 +77,7 @@ export class DrizzleAuthRepository implements AuthRepository {
       row.nombre,
       row.usuario,
       row.contrasenaHash,
-      row.rolNombre ?? "ciudadano",
+      row.rol,
       row.fechaRegistro ?? undefined
     );
   }
@@ -90,14 +88,10 @@ export class DrizzleAuthRepository implements AuthRepository {
   async register(user: User): Promise<User> {
     try {
       return await db.transaction(async (tx) => {
-        // Buscar el rol
-        const [dbRole] = await tx
-          .select({ id: roles.id })
-          .from(roles)
-          .where(eq(roles.nombre, user.rol))
-          .limit(1);
-
-        if (!dbRole) {
+        const validRoles = ["lider", "miembro", "ciudadano"] as const;
+        const mappedRole = user.rol.toLowerCase() as "lider" | "miembro" | "ciudadano";
+        
+        if (!validRoles.includes(mappedRole)) {
           throw new Error(`El rol '${user.rol}' no se encuentra configurado en el sistema.`);
         }
 
@@ -108,7 +102,7 @@ export class DrizzleAuthRepository implements AuthRepository {
             usuario: user.usuario,
             contrasenaHash: user.contrasenaHash,
             barrioId: user.barrioId,
-            rolId: dbRole.id,
+            rol: mappedRole,
           })
           .returning();
 
@@ -122,7 +116,7 @@ export class DrizzleAuthRepository implements AuthRepository {
           insertedUser.nombre,
           insertedUser.usuario,
           insertedUser.contrasenaHash,
-          user.rol,
+          insertedUser.rol,
           insertedUser.fechaRegistro ?? undefined
         );
       });
@@ -152,19 +146,16 @@ export class DrizzleAuthRepository implements AuthRepository {
    * Actualiza el rol de un usuario en el sistema.
    */
   async updateUserRole(userId: number, roleName: string): Promise<void> {
-    const [dbRole] = await db
-      .select({ id: roles.id })
-      .from(roles)
-      .where(eq(roles.nombre, roleName))
-      .limit(1);
+    const validRoles = ["lider", "miembro", "ciudadano"] as const;
+    const mappedRole = roleName.toLowerCase() as "lider" | "miembro" | "ciudadano";
 
-    if (!dbRole) {
+    if (!validRoles.includes(mappedRole)) {
       throw new Error(`El rol '${roleName}' no se encuentra configurado en el sistema.`);
     }
 
     await db
       .update(usuarios)
-      .set({ rolId: dbRole.id })
+      .set({ rol: mappedRole })
       .where(eq(usuarios.id, userId));
   }
 
@@ -181,14 +172,13 @@ export class DrizzleAuthRepository implements AuthRepository {
         usuario: usuarios.usuario,
         contrasenaHash: usuarios.contrasenaHash,
         fechaRegistro: usuarios.fechaRegistro,
-        rolNombre: roles.nombre,
+        rol: usuarios.rol,
       })
       .from(usuarios)
-      .leftJoin(roles, eq(usuarios.rolId, roles.id))
       .where(
         and(
           eq(usuarios.barrioId, barrioId),
-          eq(roles.nombre, "ciudadano")
+          eq(usuarios.rol, "ciudadano")
         )
       );
 
@@ -200,11 +190,12 @@ export class DrizzleAuthRepository implements AuthRepository {
           row.nombre,
           row.usuario,
           row.contrasenaHash,
-          row.rolNombre ?? "ciudadano",
+          row.rol,
           row.fechaRegistro ?? undefined
         )
     );
   }
 }
+
 
 

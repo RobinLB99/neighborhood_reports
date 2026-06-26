@@ -9,6 +9,11 @@ import { GetCitiesSchema } from "../../territory/application/dtos/GetCitiesDto.j
 import { GetNeighborhoodsSchema } from "../../territory/application/dtos/GetNeighborhoodsDto.js";
 import { NeighborsResponseSchema } from "../../authentication/application/dtos/GetNeighborsDto.js";
 import { CommitteeMembersListResponseSchema } from "../../committee/application/dtos/GetCommitteeMembersDto.js";
+import { CreateReportPayloadSchema } from "../../incidents/domain/entities/Reporte.js";
+import { IncidentSupportParamsSchema, SupportStatsResponseSchema } from "../../incidents/domain/entities/Apoyo.js";
+import { AddCommentParamsSchema, CreateCommentPayloadSchema } from "../../incidents/domain/entities/Comentario.js";
+import { CreateGestionParamsSchema, CreateGestionPayloadSchema } from "../../incidents/domain/entities/GestionAdministrativa.js";
+
 
 export const registry = new OpenAPIRegistry();
 
@@ -431,5 +436,474 @@ registry.registerPath({
     },
   },
 });
+
+// Nuevos esquemas para firmas de almacenamiento e incidencias
+const StorageSignatureResponseSchema = registry.register("StorageSignatureResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    signature: z.string(),
+    timestamp: z.number(),
+    folder: z.string(),
+    apiKey: z.string(),
+    cloudName: z.string(),
+  }),
+}));
+
+const CreateReportResponseSchema = registry.register("CreateReportResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    id: z.number(),
+    usuarioId: z.number(),
+    barrioId: z.number(),
+    direccion: z.string(),
+    ubicacion: z.string(),
+    fotoUrl: z.string(),
+    estado: z.string(),
+    descripcion: z.string(),
+    fechaCreacion: z.string().optional(),
+  }),
+}));
+
+// Registrar Nuevas Rutas (Endpoints)
+registry.registerPath({
+  method: "get",
+  path: "/api/storage/signature",
+  summary: "Obtener firma para subida directa de imágenes",
+  description: "Genera una firma criptográfica para permitir al frontend subir imágenes directamente a Cloudinary.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    query: z.object({
+      folder: z.string().optional().openapi({ description: "Carpeta de destino en Cloudinary" }),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Firma de Cloudinary generada con éxito.",
+      content: {
+        "application/json": {
+          schema: StorageSignatureResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/create",
+  summary: "Crear reporte de incidencia",
+  description: "Permite registrar un reporte de incidencia ciudadana en el barrio del usuario autenticado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: CreateReportPayloadSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Reporte de incidencia registrado exitosamente.",
+      content: {
+        "application/json": {
+          schema: CreateReportResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "El payload enviado contiene errores de validación.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+const IncidentSchema = z.object({
+  id: z.number(),
+  usuarioId: z.number(),
+  barrioId: z.number(),
+  direccion: z.string(),
+  ubicacion: z.string(),
+  fotoUrl: z.string(),
+  estado: z.string(),
+  descripcion: z.string(),
+  fechaCreacion: z.string().optional(),
+  fechaActualizacion: z.string().optional(),
+});
+
+const ListReportsResponseSchema = registry.register("ListReportsResponse", z.object({
+  message: z.string(),
+  data: z.array(IncidentSchema),
+  nextCursor: z.string().nullable(),
+}));
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/list",
+  summary: "Listar reportes del barrio",
+  description: "Recupera los reportes barriales filtrados por estado para el barrio del usuario autenticado (cualquier rol).",
+  security: [{ bearerAuth: [] }],
+  request: {
+    query: z.object({
+      status: z.enum(["pendiente", "en_gestion", "solucionado", "all"]).optional().openapi({ description: "Filtrar por estado del reporte" }),
+      limit: z.coerce.number().optional().openapi({ description: "Límite de reportes a recuperar (por defecto 10)" }),
+      cursor: z.string().optional().openapi({ description: "Cursor (fecha ISO) para paginación" }),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Listado de reportes recuperado con éxito.",
+      content: {
+        "application/json": {
+          schema: ListReportsResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+// Registrar esquemas de apoyos
+const ToggleSupportResponseSchema = registry.register("ToggleSupportResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    supported: z.boolean(),
+  }),
+}));
+
+const SupportStatsResponseSchemaRegistered = registry.register(
+  "SupportStatsResponse",
+  SupportStatsResponseSchema
+);
+
+const CommentItemSchema = z.object({
+  id: z.number(),
+  reporteId: z.number(),
+  usuarioId: z.number(),
+  mensaje: z.string(),
+  fechaCreacion: z.string().optional(),
+});
+
+const CreateCommentResponseSchema = registry.register("CreateCommentResponse", z.object({
+  message: z.string(),
+  data: CommentItemSchema,
+}));
+
+const ListCommentsResponseSchema = registry.register("ListCommentsResponse", z.object({
+  message: z.string(),
+  data: z.array(CommentItemSchema),
+}));
+
+// Registrar rutas de apoyos
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/{id}/supports",
+  summary: "Alternar apoyo a reporte (Corazón)",
+  description: "Registra o elimina un apoyo (like) en el reporte especificado por ID para el usuario autenticado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: IncidentSupportParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Apoyo alternado con éxito.",
+      content: {
+        "application/json": {
+          schema: ToggleSupportResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido o erróneo.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/{id}/supports",
+  summary: "Obtener estadísticas de apoyos de un reporte",
+  description: "Recupera la cantidad total de apoyos y si el usuario autenticado lo ha apoyado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: IncidentSupportParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Estadísticas de apoyos recuperadas con éxito.",
+      content: {
+        "application/json": {
+          schema: SupportStatsResponseSchemaRegistered,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido o erróneo.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/{id}/comments",
+  summary: "Registrar comentario en reporte",
+  description: "Registra un comentario en el reporte especificado por ID para el usuario autenticado.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: AddCommentParamsSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: CreateCommentPayloadSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Comentario registrado con éxito.",
+      content: {
+        "application/json": {
+          schema: CreateCommentResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Payload o ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/{id}/comments",
+  summary: "Obtener comentarios de un reporte",
+  description: "Recupera la lista de comentarios de un reporte de incidencia específico. Solo accesible para líderes y miembros.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: AddCommentParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Listado de comentarios recuperado con éxito.",
+      content: {
+        "application/json": {
+          schema: ListCommentsResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros pueden acceder.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+const CreateGestionResponseSchema = registry.register("CreateGestionResponse", z.object({
+  message: z.string(),
+  data: z.object({
+    id: z.number(),
+    reporteId: z.number(),
+    liderId: z.number(),
+    estadoAsignado: z.string(),
+    mensaje: z.string(),
+    fechaGestion: z.string().optional(),
+  }),
+}));
+
+const GestionItemSchema = z.object({
+  id: z.number(),
+  reporteId: z.number(),
+  liderId: z.number(),
+  nombreLider: z.string().optional(),
+  estadoAsignado: z.string(),
+  mensaje: z.string(),
+  fechaGestion: z.string().optional(),
+});
+
+const ListGestionesResponseSchema = registry.register("ListGestionesResponse", z.object({
+  message: z.string(),
+  data: z.array(GestionItemSchema),
+}));
+
+
+registry.registerPath({
+  method: "post",
+  path: "/api/incidents/{id}/management",
+  summary: "Registrar gestión administrativa en reporte",
+  description: "Registra una acción de gestión (cambio de estado y bitácora) en el reporte especificado por ID. Solo accesible para líderes y miembros.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: CreateGestionParamsSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: CreateGestionPayloadSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Gestión administrativa registrada con éxito.",
+      content: {
+        "application/json": {
+          schema: CreateGestionResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Payload, ID de reporte inválido, o transición de estado inválida.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros de la directiva pueden realizar esta acción.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/incidents/{id}/management",
+  summary: "Obtener historial de gestiones de un reporte",
+  description: "Recupera la lista de gestiones administrativas asociadas a un reporte. Solo accesible para líderes y miembros de la directiva.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: CreateGestionParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Historial de gestiones recuperado con éxito.",
+      content: {
+        "application/json": {
+          schema: ListGestionesResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. Solo líderes y miembros de la directiva pueden acceder.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+const DeleteIncidentResponseSchema = registry.register("DeleteIncidentResponse", z.object({
+  message: z.string(),
+}));
+
+registry.registerPath({
+  method: "delete",
+  path: "/api/incidents/{id}/delete",
+  summary: "Eliminación lógica de un reporte",
+  description: "Realiza el borrado lógico de un reporte de incidencia. Los líderes y miembros pueden eliminar cualquier reporte. Los ciudadanos solo pueden eliminar sus propios reportes.",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: CreateGestionParamsSchema,
+  },
+  responses: {
+    200: {
+      description: "Reporte eliminado exitosamente.",
+      content: {
+        "application/json": {
+          schema: DeleteIncidentResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "ID de reporte inválido.",
+    },
+    401: {
+      description: "No autorizado o token JWT inválido.",
+    },
+    403: {
+      description: "Acceso denegado. El usuario no posee permisos para eliminar este reporte.",
+    },
+    404: {
+      description: "Reporte no encontrado en el sistema o ya inactivo.",
+    },
+    500: {
+      description: "Error interno del servidor.",
+    },
+  },
+});
+
+
+
+
+
 
 

@@ -5,7 +5,7 @@ import { CommitteeMember } from "../../domain/entities/CommitteeMember.js";
 import { User } from "../../../authentication/domain/entities/User.js";
 import type { CommitteeRepository } from "../../domain/repositories/CommitteeRepository.interface.js";
 import { comites, miembrosComite } from "./schema.js";
-import { usuarios, roles } from "../../../authentication/infrastructure/database/schema.js";
+import { usuarios } from "../../../authentication/infrastructure/database/schema.js";
 import {
   CommitteeAlreadyExistsError,
   BarrioNotFoundError,
@@ -25,18 +25,7 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
   }> {
     try {
       return await db.transaction(async (tx) => {
-        // 0. Obtener el ID del rol 'lider'
-        const [dbRole] = await tx
-          .select({ id: roles.id })
-          .from(roles)
-          .where(eq(roles.nombre, "lider"))
-          .limit(1);
-
-        if (!dbRole) {
-          throw new Error("El rol 'lider' no se encuentra configurado en el sistema.");
-        }
-
-        // 1. Insertamos el usuario líder
+        // 1. Insertamos el usuario líder con rol 'lider'
         const [insertedUser] = await tx
           .insert(usuarios)
           .values({
@@ -44,7 +33,7 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
             usuario: user.usuario,
             contrasenaHash: user.contrasenaHash,
             barrioId: user.barrioId,
-            rolId: dbRole.id,
+            rol: "lider",
           })
           .returning({ id: usuarios.id });
 
@@ -139,21 +128,10 @@ export class DrizzleCommitteeRepository implements CommitteeRepository {
   }> {
     try {
       return await db.transaction(async (tx) => {
-        // 0. Obtener el ID del rol 'miembro'
-        const [dbRole] = await tx
-          .select({ id: roles.id })
-          .from(roles)
-          .where(eq(roles.nombre, "miembro"))
-          .limit(1);
-
-        if (!dbRole) {
-          throw new Error("El rol 'miembro' no se encuentra configurado en el sistema.");
-        }
-
         // 1. Actualizar el rol del usuario a 'miembro'
         const [updatedUser] = await tx
           .update(usuarios)
-          .set({ rolId: dbRole.id })
+          .set({ rol: "miembro" })
           .where(eq(usuarios.id, userId))
           .returning({ id: usuarios.id });
 

@@ -15,6 +15,20 @@
       "when": 1782274692526,
       "tag": "0001_yummy_may_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782327527052,
+      "tag": "0002_fast_scarlet_witch",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782405161957,
+      "tag": "0003_tough_doctor_octopus",
+      "breakpoints": true
     }
   ]
 }

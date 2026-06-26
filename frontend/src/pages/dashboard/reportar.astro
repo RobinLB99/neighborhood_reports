@@ -1,0 +1,10 @@
+---
+import Layout from '@shared/layouts/Layout.astro';
+import ReportIncidentForm from '@modules/incidents/ui/ReportIncidentForm';
+
+const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
+---
+
+<Layout title="Reportar Incidencia — Reportes Barriales">
+  <ReportIncidentForm client:only="preact" apiUrl={apiUrl} />
+</Layout>

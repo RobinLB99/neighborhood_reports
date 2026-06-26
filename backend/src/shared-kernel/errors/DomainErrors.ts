@@ -95,8 +95,19 @@ export class UserAlreadyInCommitteeError extends DomainError {
     );
   }
 }
+export class ReporteNotFoundError extends DomainError {
+  constructor(reporteId: number) {
+    super(
+      `El reporte con ID ${reporteId} no existe en el sistema.`,
+      "REPORTE_NOT_FOUND"
+    );
+  }
+}
 
-
-
+export class InvalidStateTransitionError extends DomainError {
+  constructor(message: string) {
+    super(message, "INVALID_STATE_TRANSITION");
+  }
+}
 
 

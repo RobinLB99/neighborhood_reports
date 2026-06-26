@@ -1,6 +1,5 @@
 import { db } from "./drizzle.js";
 import { provincias, ciudades, barrios } from "../../territory/infrastructure/database/schema.js";
-import { roles } from "../../authentication/infrastructure/database/schema.js";
 import { eq } from "drizzle-orm";
 
 const BARRIOS_GUAYAQUIL = [
@@ -148,23 +147,6 @@ async function main() {
   console.log("🚀 Iniciando el sembrado automático de datos territoriales...");
 
   try {
-    // 0. Insertar o recuperar Roles (lider, miembro, ciudadano)
-    console.log("⏳ Sembrando roles...");
-    for (const rolNombre of ["lider", "miembro", "ciudadano"]) {
-      const [existingRol] = await db
-        .select()
-        .from(roles)
-        .where(eq(roles.nombre, rolNombre))
-        .limit(1);
-
-      if (!existingRol) {
-        await db.insert(roles).values({ nombre: rolNombre });
-        console.log(`✅ Rol '${rolNombre}' creado.`);
-      } else {
-        console.log(`ℹ️ Rol '${rolNombre}' ya existe.`);
-      }
-    }
-
     // 1. Insertar o recuperar Provincia (Guayas)
     let provId: number;
     const [existingProv] = await db

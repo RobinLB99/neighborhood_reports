@@ -676,6 +676,669 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/storage/signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener firma para subida directa de imágenes
+         * @description Genera una firma criptográfica para permitir al frontend subir imágenes directamente a Cloudinary.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Carpeta de destino en Cloudinary */
+                    folder?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Firma de Cloudinary generada con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StorageSignatureResponse"];
+                    };
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/incidents/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Crear reporte de incidencia
+         * @description Permite registrar un reporte de incidencia ciudadana en el barrio del usuario autenticado.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        direccion: string;
+                        ubicacion: string;
+                        /** Format: uri */
+                        fotoUrl: string;
+                        descripcion: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Reporte de incidencia registrado exitosamente. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateReportResponse"];
+                    };
+                };
+                /** @description El payload enviado contiene errores de validación. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/incidents/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Listar reportes del barrio
+         * @description Recupera los reportes barriales filtrados por estado para el barrio del usuario autenticado (cualquier rol).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtrar por estado del reporte */
+                    status?: "pendiente" | "en_gestion" | "solucionado" | "all";
+                    /** @description Límite de reportes a recuperar (por defecto 10) */
+                    limit?: number | null;
+                    /** @description Cursor (fecha ISO) para paginación */
+                    cursor?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Listado de reportes recuperado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListReportsResponse"];
+                    };
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/incidents/{id}/supports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener estadísticas de apoyos de un reporte
+         * @description Recupera la cantidad total de apoyos y si el usuario autenticado lo ha apoyado.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Estadísticas de apoyos recuperadas con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SupportStatsResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido o erróneo. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Alternar apoyo a reporte (Corazón)
+         * @description Registra o elimina un apoyo (like) en el reporte especificado por ID para el usuario autenticado.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Apoyo alternado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ToggleSupportResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido o erróneo. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/incidents/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener comentarios de un reporte
+         * @description Recupera la lista de comentarios de un reporte de incidencia específico. Solo accesible para líderes y miembros.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Listado de comentarios recuperado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListCommentsResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros pueden acceder. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Registrar comentario en reporte
+         * @description Registra un comentario en el reporte especificado por ID para el usuario autenticado.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        mensaje: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Comentario registrado con éxito. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateCommentResponse"];
+                    };
+                };
+                /** @description Payload o ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/incidents/{id}/management": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener historial de gestiones de un reporte
+         * @description Recupera la lista de gestiones administrativas asociadas a un reporte. Solo accesible para líderes y miembros de la directiva.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Historial de gestiones recuperado con éxito. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListGestionesResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros de la directiva pueden acceder. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Registrar gestión administrativa en reporte
+         * @description Registra una acción de gestión (cambio de estado y bitácora) en el reporte especificado por ID. Solo accesible para líderes y miembros.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        estadoAsignado: "pendiente" | "en_gestion" | "solucionado";
+                        mensaje: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Gestión administrativa registrada con éxito. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateGestionResponse"];
+                    };
+                };
+                /** @description Payload, ID de reporte inválido, o transición de estado inválida. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. Solo líderes y miembros de la directiva pueden realizar esta acción. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/incidents/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Eliminación lógica de un reporte
+         * @description Realiza el borrado lógico de un reporte de incidencia. Los líderes y miembros pueden eliminar cualquier reporte. Los ciudadanos solo pueden eliminar sus propios reportes.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Reporte eliminado exitosamente. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeleteIncidentResponse"];
+                    };
+                };
+                /** @description ID de reporte inválido. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description No autorizado o token JWT inválido. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Acceso denegado. El usuario no posee permisos para eliminar este reporte. */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Reporte no encontrado en el sistema o ya inactivo. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Error interno del servidor. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -770,6 +1433,105 @@ export interface components {
                 usuario: string;
                 fechaRegistro?: string;
             }[];
+        };
+        StorageSignatureResponse: {
+            message: string;
+            data: {
+                signature: string;
+                timestamp: number;
+                folder: string;
+                apiKey: string;
+                cloudName: string;
+            };
+        };
+        CreateReportResponse: {
+            message: string;
+            data: {
+                id: number;
+                usuarioId: number;
+                barrioId: number;
+                direccion: string;
+                ubicacion: string;
+                fotoUrl: string;
+                estado: string;
+                descripcion: string;
+                fechaCreacion?: string;
+            };
+        };
+        ListReportsResponse: {
+            message: string;
+            data: {
+                id: number;
+                usuarioId: number;
+                barrioId: number;
+                direccion: string;
+                ubicacion: string;
+                fotoUrl: string;
+                estado: string;
+                descripcion: string;
+                fechaCreacion?: string;
+                fechaActualizacion?: string;
+            }[];
+            nextCursor: string | null;
+        };
+        ToggleSupportResponse: {
+            message: string;
+            data: {
+                supported: boolean;
+            };
+        };
+        SupportStatsResponse: {
+            message: string;
+            data: {
+                count: number;
+                hasSupported: boolean;
+            };
+        };
+        CreateCommentResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                usuarioId: number;
+                mensaje: string;
+                fechaCreacion?: string;
+            };
+        };
+        ListCommentsResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                usuarioId: number;
+                mensaje: string;
+                fechaCreacion?: string;
+            }[];
+        };
+        CreateGestionResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                liderId: number;
+                estadoAsignado: string;
+                mensaje: string;
+                fechaGestion?: string;
+            };
+        };
+        ListGestionesResponse: {
+            message: string;
+            data: {
+                id: number;
+                reporteId: number;
+                liderId: number;
+                nombreLider?: string;
+                estadoAsignado: string;
+                mensaje: string;
+                fechaGestion?: string;
+            }[];
+        };
+        DeleteIncidentResponse: {
+            message: string;
         };
     };
     responses: never;

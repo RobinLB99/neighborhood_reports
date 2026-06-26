@@ -1,5 +1,6 @@
 ---
 import '@shared/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title?: string;
@@ -17,8 +18,23 @@ const { title = 'Reportes Barriales — Guayaquil' } = Astro.props;
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ClientRouter />
   </head>
   <body class="font-geist bg-chalk text-graphite antialiased">
     <slot />
+
+    <script>
+      import nprogress from 'nprogress';
+
+      nprogress.configure({ showSpinner: false, minimum: 0.1 });
+
+      document.addEventListener('astro:before-preparation', () => {
+        nprogress.start();
+      });
+
+      document.addEventListener('astro:page-load', () => {
+        nprogress.done();
+      });
+    </script>
   </body>
 </html>

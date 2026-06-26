@@ -2,6 +2,7 @@ import { useState, useEffect } from 'preact/hooks';
 import useAuth from '@modules/auth/application/useAuth';
 import CommitteeMembersList from './CommitteeMembersList';
 import RegisterMemberForm from './RegisterMemberForm';
+import AppHeader from '@shared/components/ui/AppHeader';
 
 interface Props {
   apiUrl: string;
@@ -58,28 +59,7 @@ export default function CommitteeManager({ apiUrl }: Props) {
 
   return (
     <div class="min-h-screen bg-chalk">
-      <header class="border-b border-hairline bg-chalk">
-        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <a href="/dashboard" class="text-sm font-semibold text-graphite hover:underline">
-              Reportes Barriales
-            </a>
-            <span class="text-hairline">|</span>
-            <span class="text-xs text-concrete">Gestión del Comité</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <span class="text-xs text-concrete capitalize">
-              {user.nombre} ({user.rol})
-            </span>
-            <button
-              onClick={logout}
-              class="text-sm text-concrete hover:text-graphite transition-colors"
-            >
-              Cerrar sesión
-            </button>
-          </div>
-        </div>
-      </header>
+      <AppHeader user={user} onLogout={logout} pageTitle="Gestión del Comité" />
 
       <main class="max-w-5xl mx-auto px-6 py-12">
         <div class="mb-10 flex flex-col gap-2">

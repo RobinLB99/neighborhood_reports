@@ -6,5 +6,5 @@ const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
 ---
 
 <Layout title="Dashboard — Reportes Barriales">
-  <Dashboard client:load apiUrl={apiUrl} />
+  <Dashboard client:only="preact" apiUrl={apiUrl} />
 </Layout>
