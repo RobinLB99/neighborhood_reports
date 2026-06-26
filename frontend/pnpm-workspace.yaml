@@ -1,7 +1,0 @@
-allowBuilds:
-  esbuild: true
-  sharp: false
-minimumReleaseAgeExclude:
-  - esbuild@0.28.1
-overrides:
-  esbuild@<0.28.1: ^0.28.1
