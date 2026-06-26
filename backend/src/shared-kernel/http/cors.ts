@@ -24,9 +24,13 @@ export function handleCors(req: VercelRequest, res: VercelResponse): boolean {
     return false;
   }
 
-  // Validación de seguridad para determinar si el origen está explícitamente permitido o es desarrollo local
+  // Validación de seguridad para determinar si el origen está explícitamente permitido, es desarrollo local o un despliegue en Vercel
   const isAllowed =
-    ALLOWED_ORIGINS.includes(origin) || process.env.NODE_ENV === "development";
+    ALLOWED_ORIGINS.includes(origin) ||
+    process.env.NODE_ENV === "development" ||
+    /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
+    /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin) ||
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin);
 
   if (isAllowed) {
     res.setHeader("Access-Control-Allow-Origin", origin);

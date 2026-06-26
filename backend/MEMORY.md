@@ -6,7 +6,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 📅 Estado y Contexto General
 *   **Fecha de Creación:** 20 de Junio, 2026
-*   **Última Actualización:** 25 de Junio, 2026 (por Jarvis - Consolidación en Monolithic Serverless Router)
+*   **Última Actualización:** 26 de Junio, 2026 (por Jarvis - Flexibilización dinámica de CORS para Vercel)
 *   **Entorno Principal:** Node.js (Vercel Serverless Functions) con TypeScript
 *   **Arquitectura:** Concentrada en capas concéntricas (Dominio, Aplicación, Infraestructura) siguiendo Hexagonal, Clean y Screaming Architecture (detallado en [architecture.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/architecture.md)).
 
@@ -146,6 +146,15 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 *   **Consecuencias:**
     *   **Positivas:** Seguridad por diseño (evita suplantación de `usuario_id` y limita la visibilidad a roles autorizados mediante checks de roles en el handler). Encapsulamiento del dominio con límites claros. Contratos OpenAPI sincronizados y documentados en código.
     *   **Negativas:** Ninguna.
+
+### 8. Flexibilización Dinámica del Origen CORS para Despliegues de Vercel
+*   **Contexto:** Los despliegues del frontend en Vercel (tanto la rama `beta` como las ramas de vista previa generadas por pull requests) fallaban al hacer peticiones reales a la API debido a restricciones rígidas en `handleCors` del backend (que solo admitía orígenes locales o explícitamente listados en variables de entorno).
+*   **Decisión:** Flexibilizar la función `handleCors` para permitir dinámicamente cualquier petición cuyo encabezado `Origin` provenga de entornos de desarrollo local o de cualquier subdominio de Vercel (`*.vercel.app`), garantizando que las ramas preview y beta se comuniquen de forma transparente sin mantenimiento manual de variables.
+*   **Implementación:**
+    *   Uso de expresiones regulares en [cors.ts](file:///home/joel/Proyectos%20Full-Stack/reports/backend/src/shared-kernel/http/cors.ts) para validar el origen: `LOCALHOST` y `*.vercel.app`.
+*   **Consecuencias:**
+    *   **Positivas:** Solución definitiva al error de CORS en producción, agilidad en el ciclo de integración continua (CI/CD) al admitir despliegues dinámicos de pull requests sin intervención manual.
+    *   **Negativas:** Abre ligeramente la validación CORS a cualquier sitio hospedado en Vercel, mitigado por el hecho de que la autenticación de endpoints críticos requiere JWT robusto verificado por el middleware.
 
 ---
 
