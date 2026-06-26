@@ -1,13 +1,13 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { RegisterCommitteeSchema } from "../../src/committee/application/dtos/RegisterCommitteeDto.js";
-import { DrizzleCommitteeRepository } from "../../src/committee/infrastructure/database/DrizzleCommitteeRepository.js";
-import { RegisterCommitteeUseCase } from "../../src/committee/application/use-cases/RegisterCommitteeUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { RegisterCommitteeSchema } from "../../../../committee/application/dtos/RegisterCommitteeDto.js";
+import { DrizzleCommitteeRepository } from "../../../../committee/infrastructure/database/DrizzleCommitteeRepository.js";
+import { RegisterCommitteeUseCase } from "../../../../committee/application/use-cases/RegisterCommitteeUseCase.js";
 import {
   UsernameAlreadyTakenError,
   CommitteeAlreadyExistsError,
   BarrioNotFoundError,
-} from "../../src/shared-kernel/errors/DomainErrors.js";
+} from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP POST /api/auth/register-leader (Driving Adapter).

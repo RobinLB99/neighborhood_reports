@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../../src/shared-kernel/http/auth.js";
-import { DrizzleIncidentRepository } from "../../../src/incidents/infrastructure/database/DrizzleIncidentRepository.js";
-import { DrizzleIncidentCommentRepository } from "../../../src/incidents/infrastructure/database/DrizzleIncidentCommentRepository.js";
-import { AddCommentToIncidentUseCase } from "../../../src/incidents/application/use-cases/AddCommentToIncidentUseCase.js";
-import { GetIncidentCommentsUseCase } from "../../../src/incidents/application/use-cases/GetIncidentCommentsUseCase.js";
-import { AddCommentParamsSchema, CreateCommentPayloadSchema } from "../../../src/incidents/domain/entities/Comentario.js";
-import { ReporteNotFoundError } from "../../../src/shared-kernel/errors/DomainErrors.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleIncidentRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentRepository.js";
+import { DrizzleIncidentCommentRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentCommentRepository.js";
+import { AddCommentToIncidentUseCase } from "../../../../incidents/application/use-cases/AddCommentToIncidentUseCase.js";
+import { GetIncidentCommentsUseCase } from "../../../../incidents/application/use-cases/GetIncidentCommentsUseCase.js";
+import { AddCommentParamsSchema, CreateCommentPayloadSchema } from "../../../../incidents/domain/entities/Comentario.js";
+import { ReporteNotFoundError } from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP /api/incidents/[id]/comments (Driving Adapter).

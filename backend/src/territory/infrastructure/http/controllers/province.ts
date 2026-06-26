@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { DrizzleTerritoryRepository } from "../../src/territory/infrastructure/database/DrizzleTerritoryRepository.js";
-import { GetProvincesUseCase } from "../../src/territory/application/use-cases/GetProvincesUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { DrizzleTerritoryRepository } from "../../../../territory/infrastructure/database/DrizzleTerritoryRepository.js";
+import { GetProvincesUseCase } from "../../../../territory/application/use-cases/GetProvincesUseCase.js";
 
 /**
  * Handler HTTP GET /api/territory/province (Driving Adapter).

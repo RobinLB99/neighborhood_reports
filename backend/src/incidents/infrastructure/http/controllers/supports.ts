@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../../src/shared-kernel/http/auth.js";
-import { DrizzleIncidentRepository } from "../../../src/incidents/infrastructure/database/DrizzleIncidentRepository.js";
-import { DrizzleIncidentSupportRepository } from "../../../src/incidents/infrastructure/database/DrizzleIncidentSupportRepository.js";
-import { ToggleIncidentSupportUseCase } from "../../../src/incidents/application/use-cases/ToggleIncidentSupportUseCase.js";
-import { GetIncidentSupportsUseCase } from "../../../src/incidents/application/use-cases/GetIncidentSupportsUseCase.js";
-import { IncidentSupportParamsSchema } from "../../../src/incidents/domain/entities/Apoyo.js";
-import { ReporteNotFoundError } from "../../../src/shared-kernel/errors/DomainErrors.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleIncidentRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentRepository.js";
+import { DrizzleIncidentSupportRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentSupportRepository.js";
+import { ToggleIncidentSupportUseCase } from "../../../../incidents/application/use-cases/ToggleIncidentSupportUseCase.js";
+import { GetIncidentSupportsUseCase } from "../../../../incidents/application/use-cases/GetIncidentSupportsUseCase.js";
+import { IncidentSupportParamsSchema } from "../../../../incidents/domain/entities/Apoyo.js";
+import { ReporteNotFoundError } from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP GET y POST /api/incidents/[id]/supports (Driving Adapter).

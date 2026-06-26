@@ -1,16 +1,16 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../src/shared-kernel/http/auth.js";
-import { RegisterCommitteeMemberSchema } from "../../src/committee/application/dtos/RegisterCommitteeMemberDto.js";
-import { DrizzleCommitteeRepository } from "../../src/committee/infrastructure/database/DrizzleCommitteeRepository.js";
-import { DrizzleAuthRepository } from "../../src/authentication/infrastructure/database/DrizzleAuthRepository.js";
-import { RegisterCommitteeMemberUseCase } from "../../src/committee/application/use-cases/RegisterCommitteeMemberUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { RegisterCommitteeMemberSchema } from "../../../../committee/application/dtos/RegisterCommitteeMemberDto.js";
+import { DrizzleCommitteeRepository } from "../../../../committee/infrastructure/database/DrizzleCommitteeRepository.js";
+import { DrizzleAuthRepository } from "../../../../authentication/infrastructure/database/DrizzleAuthRepository.js";
+import { RegisterCommitteeMemberUseCase } from "../../../../committee/application/use-cases/RegisterCommitteeMemberUseCase.js";
 import {
   UserNotFoundError,
   CommitteeNotFoundError,
   UserBarrioMismatchError,
   UserAlreadyInCommitteeError,
-} from "../../src/shared-kernel/errors/DomainErrors.js";
+} from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP POST /api/committee/members (Driving Adapter).

@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../../src/shared-kernel/http/auth.js";
-import { DrizzleCommitteeRepository } from "../../../src/committee/infrastructure/database/DrizzleCommitteeRepository.js";
-import { GetCommitteeMembersUseCase } from "../../../src/committee/application/use-cases/GetCommitteeMembersUseCase.js";
-import { CommitteeNotFoundError } from "../../../src/shared-kernel/errors/DomainErrors.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleCommitteeRepository } from "../../../../committee/infrastructure/database/DrizzleCommitteeRepository.js";
+import { GetCommitteeMembersUseCase } from "../../../../committee/application/use-cases/GetCommitteeMembersUseCase.js";
+import { CommitteeNotFoundError } from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP GET /api/committee/members/list (Driving Adapter).

@@ -3,7 +3,6 @@ import Layout from '@shared/layouts/Layout.astro';
 import LoginForm from '@modules/auth/ui/LoginForm';
 
 const apiUrl = import.meta.env.PUBLIC_API_URL ?? '';
-const registered = Astro.url.searchParams.get('registered') === 'true';
 ---
 
 <Layout title="Iniciar sesión — Reportes Barriales">
@@ -22,11 +21,21 @@ const registered = Astro.url.searchParams.get('registered') === 'true';
         </p>
       </div>
 
-      {registered && (
-        <div class="mb-4 text-sm text-graphite bg-mist border border-hairline rounded-lg px-3 py-2.5">
-          Comité registrado exitosamente. Ahora puedes iniciar sesión.
-        </div>
-      )}
+      <!-- Banner de Éxito -->
+      <div id="banner-success" class="hidden mb-4 flex items-center gap-3 text-sm text-graphite bg-mist border border-hairline rounded-lg px-3 py-2.5">
+        <svg class="w-4 h-4 text-graphite flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span id="banner-success-message">Cuenta registrada exitosamente. Ahora puedes iniciar sesión.</span>
+      </div>
+
+      <!-- Banner de Error -->
+      <div id="banner-error" class="hidden mb-4 flex items-center gap-3 text-sm text-chalk bg-carbon rounded-lg px-3 py-2.5">
+        <svg class="w-4 h-4 text-chalk flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span id="banner-error-message">Hubo un problema con el registro. Por favor, intenta de nuevo.</span>
+      </div>
 
       <div class="bg-chalk border border-hairline rounded-xl p-6">
         <LoginForm client:load apiUrl={apiUrl} />
@@ -48,3 +57,27 @@ const registered = Astro.url.searchParams.get('registered') === 'true';
     </div>
   </main>
 </Layout>
+
+<script>
+  // Parse URL search params in the browser
+  const params = new URLSearchParams(window.location.search);
+  const registered = params.get('registered');
+  const status = params.get('status');
+  const message = params.get('message');
+
+  if (status === 'success' || registered === 'true') {
+    const banner = document.getElementById('banner-success');
+    const msgSpan = document.getElementById('banner-success-message');
+    if (banner && msgSpan) {
+      if (message) msgSpan.textContent = message;
+      banner.classList.remove('hidden');
+    }
+  } else if (status === 'error' || registered === 'false') {
+    const banner = document.getElementById('banner-error');
+    const msgSpan = document.getElementById('banner-error-message');
+    if (banner && msgSpan) {
+      if (message) msgSpan.textContent = message;
+      banner.classList.remove('hidden');
+    }
+  }
+</script>

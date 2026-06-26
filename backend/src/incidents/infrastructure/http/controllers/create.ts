@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../src/shared-kernel/http/auth.js";
-import { CreateReportPayloadSchema } from "../../src/incidents/domain/entities/Reporte.js";
-import { DrizzleIncidentRepository } from "../../src/incidents/infrastructure/database/DrizzleIncidentRepository.js";
-import { CreateReportUseCase } from "../../src/incidents/application/use-cases/CreateReportUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { CreateReportPayloadSchema } from "../../../../incidents/domain/entities/Reporte.js";
+import { DrizzleIncidentRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentRepository.js";
+import { CreateReportUseCase } from "../../../../incidents/application/use-cases/CreateReportUseCase.js";
 
 /**
  * Handler HTTP POST /api/incidents/create (Driving Adapter).

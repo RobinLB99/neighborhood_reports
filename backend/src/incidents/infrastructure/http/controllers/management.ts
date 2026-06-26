@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../../src/shared-kernel/http/auth.js";
-import { DrizzleIncidentRepository } from "../../../src/incidents/infrastructure/database/DrizzleIncidentRepository.js";
-import { DrizzleIncidentGestionRepository } from "../../../src/incidents/infrastructure/database/DrizzleIncidentGestionRepository.js";
-import { RegistrarGestionAdministrativaUseCase } from "../../../src/incidents/application/use-cases/RegistrarGestionAdministrativaUseCase.js";
-import { ObtenerGestionesPorReporteUseCase } from "../../../src/incidents/application/use-cases/ObtenerGestionesPorReporteUseCase.js";
-import { CreateGestionParamsSchema, CreateGestionPayloadSchema } from "../../../src/incidents/domain/entities/GestionAdministrativa.js";
-import { ReporteNotFoundError, InvalidStateTransitionError } from "../../../src/shared-kernel/errors/DomainErrors.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleIncidentRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentRepository.js";
+import { DrizzleIncidentGestionRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentGestionRepository.js";
+import { RegistrarGestionAdministrativaUseCase } from "../../../../incidents/application/use-cases/RegistrarGestionAdministrativaUseCase.js";
+import { ObtenerGestionesPorReporteUseCase } from "../../../../incidents/application/use-cases/ObtenerGestionesPorReporteUseCase.js";
+import { CreateGestionParamsSchema, CreateGestionPayloadSchema } from "../../../../incidents/domain/entities/GestionAdministrativa.js";
+import { ReporteNotFoundError, InvalidStateTransitionError } from "../../../../shared-kernel/errors/DomainErrors.js";
 
 /**
  * Handler HTTP /api/incidents/[id]/management (Driving Adapter).

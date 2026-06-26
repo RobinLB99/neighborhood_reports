@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { handleCors } from "../../../src/shared-kernel/http/cors.js";
-import { getAuthenticatedUser } from "../../../src/shared-kernel/http/auth.js";
-import { DrizzleIncidentRepository } from "../../../src/incidents/infrastructure/database/DrizzleIncidentRepository.js";
-import { DeleteIncidentUseCase } from "../../../src/incidents/application/use-cases/DeleteIncidentUseCase.js";
+import { handleCors } from "../../../../shared-kernel/http/cors.js";
+import { getAuthenticatedUser } from "../../../../shared-kernel/http/auth.js";
+import { DrizzleIncidentRepository } from "../../../../incidents/infrastructure/database/DrizzleIncidentRepository.js";
+import { DeleteIncidentUseCase } from "../../../../incidents/application/use-cases/DeleteIncidentUseCase.js";
 import { z } from "zod";
 
 // Esquema de validación para los parámetros de ruta al eliminar.

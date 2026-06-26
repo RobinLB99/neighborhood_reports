@@ -6,7 +6,7 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 
 ## 📅 Estado y Contexto General
 *   **Fecha de Creación:** 20 de Junio, 2026
-*   **Última Actualización:** 25 de Junio, 2026 (por Jarvis - Implementación de Paginación Basada en Cursor)
+*   **Última Actualización:** 25 de Junio, 2026 (por Jarvis - Consolidación en Monolithic Serverless Router)
 *   **Entorno Principal:** Node.js (Vercel Serverless Functions) con TypeScript
 *   **Arquitectura:** Concentrada en capas concéntricas (Dominio, Aplicación, Infraestructura) siguiendo Hexagonal, Clean y Screaming Architecture (detallado en [architecture.md](file:///home/joel/Proyectos%20Full-Stack/reports/backend/architecture.md)).
 
@@ -182,6 +182,17 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Evita fallos de arranque silenciosos en nuevos entornos y facilita el onboarding de desarrollo.
     *   **Negativas:** Ninguna.
 
+### 5. Consolidación de Endpoints mediante Monolithic Serverless Router (ADR 0004)
+*   **Contexto:** El plan Hobby de Vercel impone un límite estricto de 12 Serverless Functions por despliegue. Dado que el proyecto creció a 18 endpoints, el despliegue nativo fallaba sistemáticamente.
+*   **Decisión:** Abandonar el enrutamiento nativo por carpetas de Vercel en `api/` y consolidar todo el tráfico en Express utilizando el punto de entrada catch-all `/api/[...slug].ts`. Los archivos de controladores individuales se movieron a la infraestructura de sus respectivos Bounded Contexts.
+*   **Implementación:**
+    *   **Enrutador Express centralizado:** Creado en [backend/api/\[...slug\].ts](file:///home/joel/Proyectos%20Full-Stack/reports/backend/api/%5B...slug%5D.ts), el cual recibe todas las solicitudes y las despacha a los controladores reubicados en `src/`.
+    *   **Adapter Wrapper (`adapt`):** Envuelve los controladores existentes. Para conservar compatibilidad con validaciones Zod y parámetros dinámicos, copia `req.params` en `req.query`.
+    *   **Parche de Inmutabilidad de `req.query`:** Dado que el objeto request de Vercel define `req.query` como un read-only getter, Express fallaba al intentar asignarle valores directamente. Se solucionó redefiniendo la propiedad dinámicamente mediante `Object.defineProperty(req, 'query', { value: ... })` inyectada en el wrapper.
+*   **Consecuencias:**
+    *   **Positivas:** Se redujo el número de funciones serverless a solo 2 (`api/[...slug].ts` y `api/health.ts`), logrando un despliegue exitoso en el plan Hobby. Se mantiene la modularidad y "Screaming Architecture" al remover adaptadores de la raíz del proyecto.
+    *   **Negativas:** Se pierde el enrutamiento automático basado en archivos de Vercel; nuevos endpoints deben registrarse explícitamente en la aplicación de Express central.
+
 ---
 
 ## 📋 Tareas Pendientes e Hitos Inmediatos
@@ -199,3 +210,4 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
 - [x] Diseñar e implementar el endpoint de registro de gestión administrativa (`POST /api/incidents/[id]/management`) para líderes/miembros.
 - [ ] Renombrar la columna `lider_id` a `usuario_id` en la tabla `gestiones_directiva` mediante una migración de Drizzle.
 - [ ] Continuar estructurando las capas concéntricas de los dominios (`worker-profile`, `identity-validation`, etc.).
+- [x] Corregir la regla de `rewrites` obsoleta en [vercel.json](file:///home/joel/Proyectos%20Full-Stack/reports/backend/vercel.json) que apunta a `api/index.ts` (archivo inexistente) redirigiéndola a `api/[...slug].ts` para solucionar problemas de comunicación del frontend con la API en producción.
