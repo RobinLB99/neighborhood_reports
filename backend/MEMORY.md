@@ -147,14 +147,17 @@ Este archivo sirve para preservar el contexto de las decisiones técnicas y arqu
     *   **Positivas:** Seguridad por diseño (evita suplantación de `usuario_id` y limita la visibilidad a roles autorizados mediante checks de roles en el handler). Encapsulamiento del dominio con límites claros. Contratos OpenAPI sincronizados y documentados en código.
     *   **Negativas:** Ninguna.
 
-### 8. Flexibilización Dinámica del Origen CORS para Despliegues de Vercel
-*   **Contexto:** Los despliegues del frontend en Vercel (tanto la rama `beta` como las ramas de vista previa generadas por pull requests) fallaban al hacer peticiones reales a la API debido a restricciones rígidas en `handleCors` del backend (que solo admitía orígenes locales o explícitamente listados en variables de entorno).
-*   **Decisión:** Flexibilizar la función `handleCors` para permitir dinámicamente cualquier petición cuyo encabezado `Origin` provenga de entornos de desarrollo local o de cualquier subdominio de Vercel (`*.vercel.app`), garantizando que las ramas preview y beta se comuniquen de forma transparente sin mantenimiento manual de variables.
+### 8. Flexibilización Dinámica del Origen CORS y Control de Caché en Vercel
+*   **Contexto:** Los despliegues del frontend en Vercel (ramas `beta`, de vista previa y producción) fallaban por CORS. Adicionalmente, al desplegar un nuevo proyecto del frontend en Vercel, los endpoints con caché HTTP agresiva (ej: `/api/territory/province`) eran servidos directamente desde la CDN de Vercel (`x-vercel-cache: HIT`) sin cabeceras CORS debido a que la CDN almacenaba la respuesta de peticiones iniciales sin filtrar por origen.
+*   **Decisión:** 
+    *   Flexibilizar la función `handleCors` en [cors.ts](file:///home/joel/Proyectos%20Full-Stack/reports/backend/src/shared-kernel/http/cors.ts) para permitir dinámicamente cualquier petición cuyo origen provenga de entornos de desarrollo local o subdominios `*.vercel.app` (incluyendo barra diagonal final opcional mediante `\/?`).
+    *   Inyectar la cabecera `Vary: Origin` para forzar a la CDN de Vercel a cachear respuestas independientes en función del origen del cliente, evitando el envenenamiento de caché (CORS Cache Poisoning).
 *   **Implementación:**
-    *   Uso de expresiones regulares en [cors.ts](file:///home/joel/Proyectos%20Full-Stack/reports/backend/src/shared-kernel/http/cors.ts) para validar el origen: `LOCALHOST` y `*.vercel.app`.
+    *   Modificación de la regex en [cors.ts](file:///home/joel/Proyectos%20Full-Stack/reports/backend/src/shared-kernel/http/cors.ts) a `/^https:\/\/[a-zA-Z0-9-]+\.vercel\.app\/?$/`.
+    *   Llamada a `res.setHeader("Vary", "Origin")` dentro del bloque de origen permitido.
 *   **Consecuencias:**
-    *   **Positivas:** Solución definitiva al error de CORS en producción, agilidad en el ciclo de integración continua (CI/CD) al admitir despliegues dinámicos de pull requests sin intervención manual.
-    *   **Negativas:** Abre ligeramente la validación CORS a cualquier sitio hospedado en Vercel, mitigado por el hecho de que la autenticación de endpoints críticos requiere JWT robusto verificado por el middleware.
+    *   **Positivas:** Solución definitiva al error de CORS en entornos dinámicos y de producción multi-despliegue en Vercel, protegiendo las respuestas cacheadas en la CDN de Vercel.
+    *   **Negativas:** Aumenta ligeramente la cantidad de cachés independientes guardadas en la CDN para endpoints con `Cache-Control`.
 
 ---
 
