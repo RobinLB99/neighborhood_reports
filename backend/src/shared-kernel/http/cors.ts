@@ -30,9 +30,10 @@ export function handleCors(req: VercelRequest, res: VercelResponse): boolean {
     process.env.NODE_ENV === "development" ||
     /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
     /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin) ||
-    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin);
+    /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app\/?$/.test(origin);
 
   if (isAllowed) {
+    res.setHeader("Vary", "Origin");
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader(
